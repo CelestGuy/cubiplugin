@@ -1,0 +1,10 @@
+name: cubiplugin
+description: Le Plugin Principal de la Garderie
+main: net.ddns.lagarderie.cubiplugin.Main
+version: 0.0.1
+api-version: '1.18'
+
+commands:
+  infos:
+    description: Get plugin's infos
+    usage: /<command>
