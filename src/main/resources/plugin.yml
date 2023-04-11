@@ -1,7 +1,13 @@
 name: cubiplugin
 description: Le Plugin Principal de la Garderie
-main: net.ddns.lagarderie.cubiplugin.Main
+main: net.ddns.lagarderie.cubiplugin.RacingPlugin
 version: 0.0.1
 api-version: '1.18'
 
 commands:
+  game:
+    description: Paramétrage de la partie
+  checkpoint:
+    description: Active ou désactive le mode miroir
+  track:
+    description: Paramétrage d'une course
