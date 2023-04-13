@@ -1,6 +1,7 @@
 package net.ddns.lagarderie.cubiplugin.commands.track;
 
-import net.ddns.lagarderie.cubiplugin.RacingPlugin;
+import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
+import net.ddns.lagarderie.cubiplugin.game.Racing;
 import net.ddns.lagarderie.cubiplugin.game.Track;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -9,7 +10,9 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class CommandCreate implements TabExecutor {
+import static net.ddns.lagarderie.cubiplugin.utils.TrackSaveUtils.saveTrack;
+
+public class CommandTrackCreate implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
@@ -17,19 +20,20 @@ public class CommandCreate implements TabExecutor {
             track.setMapId(player.getWorld().getName());
             track.setName(player.getWorld().getName());
 
-            if (RacingPlugin.getInstance().getTracks().add(track)) {
+            if (Racing.getInstance().getTracks().add(track)) {
                 player.sendMessage("La course a été créée");
-                return true;
             } else {
-                player.sendMessage("Une erreur est survenue lors de la création de la course");
+                throw new RacingCommandException("Une erreur est survenue lors de la création de la course");
             }
+
+            saveTrack(track);
         }
 
-        return false;
+        return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        return List.of("");
+        return List.of();
     }
 }

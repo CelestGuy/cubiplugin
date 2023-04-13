@@ -8,7 +8,7 @@ public class Track {
     private String name;
     private TrackLocation departureLineStart;
     private TrackLocation departureLineEnd;
-    private List<TrackLocation> checkpoints;
+    private final List<TrackLocation> checkpoints;
 
     public Track() {
         checkpoints = new ArrayList<>();

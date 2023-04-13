@@ -19,7 +19,7 @@ public class TrackDebugMode implements Runnable {
     @Override
     public void run() {
         while (running) {
-            ArrayList<Track> tracks = RacingPlugin.getInstance().getTracks();
+            ArrayList<Track> tracks = Racing.getInstance().getTracks();
 
             for (World world : RacingPlugin.getInstance().getServer().getWorlds()) {
                 for (Track track : tracks) {

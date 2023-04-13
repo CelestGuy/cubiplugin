@@ -6,7 +6,7 @@ import org.bukkit.command.TabExecutor;
 
 import java.util.List;
 
-public class CommandStart implements TabExecutor {
+public class CommandGameTrack implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         return false;

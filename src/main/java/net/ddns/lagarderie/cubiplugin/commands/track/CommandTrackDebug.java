@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class CommandDebug implements TabExecutor {
+public class CommandTrackDebug implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
@@ -34,6 +34,6 @@ public class CommandDebug implements TabExecutor {
             return List.of("enable", "disable");
         }
 
-        return List.of("");
+        return List.of();
     }
 }

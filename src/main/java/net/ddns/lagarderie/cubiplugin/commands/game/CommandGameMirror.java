@@ -1,4 +1,4 @@
-package net.ddns.lagarderie.cubiplugin.commands;
+package net.ddns.lagarderie.cubiplugin.commands.game;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -6,7 +6,7 @@ import org.bukkit.command.TabExecutor;
 
 import java.util.List;
 
-public class CommandGame implements TabExecutor {
+public class CommandGameMirror implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         return false;
@@ -14,6 +14,6 @@ public class CommandGame implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        return List.of("");
+        return List.of("enable", "disable");
     }
 }

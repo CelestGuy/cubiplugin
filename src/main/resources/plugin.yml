@@ -8,6 +8,8 @@ commands:
   game:
     description: Paramétrage de la partie
   checkpoint:
-    description: Active ou désactive le mode miroir
+    description: Paramétrage des checkpoints d'une course
+  departure:
+    description: Paramétrage de la ligne de départ d'une course
   track:
     description: Paramétrage d'une course
