@@ -18,8 +18,11 @@ public class CommandCheckpoint implements TabExecutor {
 
     public CommandCheckpoint() {
         commandArgs.put("add", new CommandCheckpointAdd());
+        commandArgs.put("draw", new CommandCheckpointDraw());
         commandArgs.put("list", new CommandCheckpointList());
+        commandArgs.put("radius", new CommandCheckpointRadius());
         commandArgs.put("remove", new CommandCheckpointRemove());
+        commandArgs.put("value", new CommandCheckpointValue());
     }
 
     @Override

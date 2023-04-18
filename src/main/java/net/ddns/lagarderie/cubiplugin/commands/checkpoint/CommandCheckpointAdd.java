@@ -1,6 +1,8 @@
 package net.ddns.lagarderie.cubiplugin.commands.checkpoint;
 
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
+import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
+import net.ddns.lagarderie.cubiplugin.game.Checkpoint;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import net.ddns.lagarderie.cubiplugin.game.Track;
 import net.ddns.lagarderie.cubiplugin.game.TrackLocation;
@@ -12,54 +14,67 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static net.ddns.lagarderie.cubiplugin.utils.TrackSaveUtils.saveTrack;
+import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.getTrack;
+import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.saveTrack;
 
 public class CommandCheckpointAdd implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
             String worldName = player.getWorld().getName();
+            Track track;
 
-            for (Track track : Racing.getInstance().getTracks()) {
-                if (track.getMapId().equals(worldName)) {
-                    Location location = player.getLocation();
+            try {
+                track = getTrack(worldName);
+            } catch (RacingGameException e) {
+                throw new RacingCommandException(e.getMessage());
+            }
 
-                    if (location.getX() < 0) {
-                        location.setX((int) (location.getX()) - 0.5);
-                    } else {
-                        location.setX((int) (location.getX()) + 0.5);
-                    }
+            Location location = player.getLocation();
 
-                    location.setY((int) (location.getY()));
+            System.out.println(location.getX() < 0 ? -1 : 1);
 
-                    if (location.getZ() < 0) {
-                        location.setZ((int) (location.getZ()) - 0.5);
-                    } else {
-                        location.setZ((int) (location.getZ()) + 0.5);
-                    }
+            location.setX((int) (location.getX()) + (0.5 * (location.getX() < 0 ? -1 : 1)));
+            location.setY((int) (location.getY()));
+            location.setZ((int) (location.getZ()) + (0.5 * (location.getZ() < 0 ? -1 : 1)));
 
-                    for (TrackLocation tl : track.getCheckpoints()) {
-                        if ((int) (tl.getX()) == (int) (location.getX())
-                                && (int) (tl.getY()) == (int) (location.getY())
-                                && (int) (tl.getZ()) == (int) (location.getZ())) {
-                            throw new RacingCommandException("Ce checkpoint existe déjà !");
-                        }
-                    }
+            for (Checkpoint checkpoint : track.getCheckpoints()) {
+                int checkpointX = (int) (checkpoint.getTrackLocation().getX());
+                int checkpointY = (int) (checkpoint.getTrackLocation().getY());
+                int checkpointZ = (int) (checkpoint.getTrackLocation().getZ());
+                int locationX = (int) (location.getX());
+                int locationY = (int) (location.getY());
+                int locationZ = (int) (location.getZ());
 
-                    track.getCheckpoints().add(new TrackLocation(location));
-                    player.sendMessage("Checkpoint (" +
-                            "§4" + location.getX() +
-                            "§r/§2" + location.getY() +
-                            "§r/§9" + location.getZ() + "§r)§a ajouté§r !"
-                    );
-
-                    saveTrack(track);
-
-                    return true;
+                if (checkpointX == locationX && checkpointY == locationY && checkpointZ == locationZ) {
+                    throw new RacingCommandException("Ce checkpoint existe déjà !");
                 }
             }
 
-            throw new RacingCommandException("Ce monde ne contient pas de fichier de course.");
+            Checkpoint checkpoint = new Checkpoint();
+            checkpoint.setTrackLocation(new TrackLocation(location));
+
+            if (strings.length == 1) {
+                checkpoint.setValue(Integer.parseInt(strings[0]));
+            } else {
+                int maxNum = 0;
+
+                for (Checkpoint c : track.getCheckpoints()) {
+                    if (c.getValue() > maxNum) {
+                        maxNum = c.getValue();
+                    }
+                }
+
+                checkpoint.setValue(maxNum + 1);
+            }
+
+            track.getCheckpoints().add(checkpoint);
+            player.sendMessage(checkpoint.toString() + "§a ajouté§r ! "
+            );
+
+            saveTrack(track);
+
+            return true;
         }
 
         return false;

@@ -3,8 +3,6 @@ package net.ddns.lagarderie.cubiplugin.commands.departure;
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import net.ddns.lagarderie.cubiplugin.game.Track;
-import net.ddns.lagarderie.cubiplugin.game.TrackLocation;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -12,7 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static net.ddns.lagarderie.cubiplugin.utils.TrackSaveUtils.saveTrack;
+import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.saveTrack;
 
 public class CommandDepartureRemove implements TabExecutor {
     @Override
@@ -22,10 +20,9 @@ public class CommandDepartureRemove implements TabExecutor {
 
             for (Track track : Racing.getInstance().getTracks()) {
                 if (track.getMapId().equals(worldName)) {
-                    track.setDepartureLineStart(null);
-                    track.setDepartureLineEnd(null);
+                    track.setDeparture(null);
 
-                    player.sendMessage("Points de la ligne de départ supprimés !");
+                    player.sendMessage("Point de départ supprimé !");
 
                     saveTrack(track);
                     return true;

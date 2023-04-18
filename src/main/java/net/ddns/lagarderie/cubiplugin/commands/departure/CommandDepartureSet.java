@@ -12,9 +12,9 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static net.ddns.lagarderie.cubiplugin.utils.TrackSaveUtils.saveTrack;
+import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.saveTrack;
 
-public class CommandDepartureEnd implements TabExecutor {
+public class CommandDepartureSet implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
@@ -38,17 +38,18 @@ public class CommandDepartureEnd implements TabExecutor {
                         location.setZ((int) (location.getZ()) + 0.5);
                     }
 
-                    TrackLocation tl = track.getDepartureLineEnd();
+                    TrackLocation tl = track.getDeparture();
 
-                    if ((int) (tl.getX()) == (int) (location.getX())
-                            && (int) (tl.getY()) == (int) (location.getY())
-                            && (int) (tl.getZ()) == (int) (location.getZ())) {
-                        throw new RacingCommandException("Point de fin déjà placé à cet emplacement !");
+                    if (tl != null) {
+                        if ((int) (tl.getX()) == (int) (location.getX())
+                                && (int) (tl.getY()) == (int) (location.getY())
+                                && (int) (tl.getZ()) == (int) (location.getZ())) {
+                            throw new RacingCommandException("Point de départ déjà placé à cet emplacement !");
+                        }
                     }
 
-
-                    track.setDepartureLineEnd(new TrackLocation(location));
-                    player.sendMessage("Point de fin de la ligne (" +
+                    track.setDeparture(new TrackLocation(location));
+                    player.sendMessage("Point de départ de la ligne (" +
                             "§4" + location.getX() +
                             "§r/§2" + location.getY() +
                             "§r/§9" + location.getZ() + "§r) modifié !"

@@ -1,14 +1,25 @@
 package net.ddns.lagarderie.cubiplugin.utils;
 
+import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
+import net.ddns.lagarderie.cubiplugin.game.Racing;
 import net.ddns.lagarderie.cubiplugin.game.Track;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
-public class TrackSaveUtils {
+public class TrackUtils {
+    public static Track getTrack(String trackId) throws RacingGameException {
+        for (Track track : Racing.getInstance().getTracks()) {
+            if (track.getMapId().equals(trackId)) {
+                return track;
+            }
+        }
+
+        throw new RacingGameException("Cet id de course n'existe pas.");
+    }
+
     public static ArrayList<Track> loadTracks() {
         ArrayList<Track> tracks = new ArrayList<>();
 

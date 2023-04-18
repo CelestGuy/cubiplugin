@@ -4,7 +4,8 @@ import net.ddns.lagarderie.cubiplugin.commands.checkpoint.CommandCheckpoint;
 import net.ddns.lagarderie.cubiplugin.commands.departure.CommandDeparture;
 import net.ddns.lagarderie.cubiplugin.commands.game.CommandGame;
 import net.ddns.lagarderie.cubiplugin.commands.track.CommandTrack;
-import net.ddns.lagarderie.cubiplugin.game.TrackDebugMode;
+import net.ddns.lagarderie.cubiplugin.modes.RacingMode;
+import net.ddns.lagarderie.cubiplugin.modes.TrackDebugMode;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,11 +13,11 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 
-import static net.ddns.lagarderie.cubiplugin.utils.TrackSaveUtils.saveTracks;
+import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.saveTracks;
 
 public class RacingPlugin extends JavaPlugin {
     private static RacingPlugin instance = null;
-    private final TrackDebugMode trackDebugMode = new TrackDebugMode();
+    private final HashMap<String, RacingMode> modes = new HashMap<>();
 
     public RacingPlugin() {
         instance = this;
@@ -55,7 +56,26 @@ public class RacingPlugin extends JavaPlugin {
         saveTracks(Racing.getInstance().getTracks());
     }
 
-    public TrackDebugMode getTrackDebugMode() {
-        return trackDebugMode;
+    public boolean startMode(String playerName, RacingMode mode) {
+        RacingMode actualMode = modes.get(playerName);
+
+        if (actualMode != mode) {
+            modes.put(playerName, mode);
+            mode.start();
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean stopMode(String playerName, RacingMode mode) {
+        mode.stop();
+        modes.remove(playerName);
+
+        return true;
+    }
+
+    public RacingMode getMode(String playerName) {
+        return modes.get(playerName);
     }
 }
