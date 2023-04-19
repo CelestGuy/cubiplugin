@@ -32,8 +32,11 @@ public class CommandCheckpointRadius implements TabExecutor {
                 throw new RacingCommandException(e.getMessage());
             }
 
-            checkpoint.setRadius(radius);
-            player.sendMessage("Rayon du checkpoint : " + checkpoint);
+            if (checkpoint != null) {
+                checkpoint.setRadius(radius);
+                player.sendMessage("Rayon du checkpoint : " + checkpoint);
+            }
+
             return true;
         }
 

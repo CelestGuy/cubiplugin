@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.ddns.lagarderie.cubiplugin.utils.CheckpointUtils.getClosestCheckpoint;
@@ -28,7 +29,7 @@ public class CommandCheckpointRemove implements TabExecutor {
                 track = getTrack(worldName);
                 checkpoint = getClosestCheckpoint(player, track);
 
-                if (strings.length == 1) {
+                if (strings.length == 1 && !strings[0].equals("all")) {
                     checkpointNum = Integer.parseInt(strings[0]);
                 }
             } catch (RacingGameException | NumberFormatException e) {
@@ -47,7 +48,10 @@ public class CommandCheckpointRemove implements TabExecutor {
                     throw new RacingCommandException(e.getMessage());
                 }
             } else {
-                if (track.removeCheckpoint(checkpoint)) {
+                if (strings.length == 1 && strings[0].equals("all")) {
+                    track.setCheckpoints(new ArrayList<>());
+                    player.sendMessage("Tous les checkpoints ont été supprimés");
+                } else if (track.removeCheckpoint(checkpoint)) {
                     player.sendMessage(checkpoint + " §c supprimé !");
                     return true;
                 }

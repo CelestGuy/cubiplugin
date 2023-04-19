@@ -20,7 +20,7 @@ public class CommandTrackCreate implements TabExecutor {
             track.setMapId(player.getWorld().getName());
             track.setName(player.getWorld().getName());
 
-            if (Racing.getInstance().getTracks().add(track)) {
+            if (Racing.tracks.add(track)) {
                 player.sendMessage("La course a été créée");
             } else {
                 throw new RacingCommandException("Une erreur est survenue lors de la création de la course");

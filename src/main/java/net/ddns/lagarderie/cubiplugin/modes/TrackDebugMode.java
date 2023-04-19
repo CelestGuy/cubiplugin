@@ -3,23 +3,19 @@ package net.ddns.lagarderie.cubiplugin.modes;
 import net.ddns.lagarderie.cubiplugin.RacingPlugin;
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
 import net.ddns.lagarderie.cubiplugin.game.Checkpoint;
-import net.ddns.lagarderie.cubiplugin.game.Racing;
 import net.ddns.lagarderie.cubiplugin.game.Track;
-import net.ddns.lagarderie.cubiplugin.game.TrackLocation;
 import org.bukkit.*;
 import org.bukkit.Color;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.ArrayList;
-
 import static net.ddns.lagarderie.cubiplugin.utils.CheckpointUtils.getClosestCheckpoint;
+import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.getCheckpointsNearPlayer;
 import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.getTrack;
-import static org.bukkit.Bukkit.getServer;
 
 public class TrackDebugMode implements RacingMode {
-    private final boolean[] running = {false};
+    private boolean running = false;
     private final String trackId;
     private final Player player;
 
@@ -30,7 +26,7 @@ public class TrackDebugMode implements RacingMode {
     }
 
     public void start() {
-        running[0] = true;
+        running = true;
         run();
     }
 
@@ -38,7 +34,7 @@ public class TrackDebugMode implements RacingMode {
         BukkitScheduler scheduler = Bukkit.getScheduler();
 
         scheduler.runTaskTimer(RacingPlugin.getInstance(), task -> {
-            if (!running[0]) {
+            if (!running) {
                 task.cancel();
             } else {
                 Track track;
@@ -46,19 +42,17 @@ public class TrackDebugMode implements RacingMode {
                 try {
                     track = getTrack(trackId);
                 } catch (RacingGameException e) {
+                    stop();
                     throw new RuntimeException(e);
                 }
 
-                TrackLocation departure = track.getDeparture();
                 World world = player.getWorld();
 
                 if (world.getName().equals(track.getMapId())) {
-                    Checkpoint playersClosestCheckpoint = null;
-                    try {
-                        playersClosestCheckpoint = getClosestCheckpoint(player, track);
-                    } catch (RacingGameException ignored) {}
+                    Checkpoint playersClosestCheckpoint;
+                    playersClosestCheckpoint = getClosestCheckpoint(player, track);
 
-                    for (Checkpoint checkpoint : track.getCheckpoints()) {
+                    for (Checkpoint checkpoint : getCheckpointsNearPlayer(player, track, 16)) {
                         Color color = Color.AQUA;
                         if (checkpoint == playersClosestCheckpoint) {
                             color = Color.YELLOW;
@@ -67,17 +61,13 @@ public class TrackDebugMode implements RacingMode {
                         spawnRedstoneParticle(checkpoint.getTrackLocation(), color, 0.5f);
                         drawCircle(checkpoint.getTrackLocation(), checkpoint.getRadius());
                     }
-
-                    if (departure != null) {
-                        spawnRedstoneParticle(departure, Color.RED, 0.5f);
-                    }
                 }
             }
         }, 0L, 5L);
     }
 
     public void stop() {
-        running[0] = false;
+        running = false;
     }
 
     private void drawCircle(Location location, float radius) {

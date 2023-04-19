@@ -8,8 +8,11 @@ import java.util.List;
 public class Track {
     private String mapId;
     private String name;
-    private TrackLocation departure;
     private List<Checkpoint> checkpoints;
+
+    private int departureCheckpoint;
+    private int arrivalCheckpoint;
+
 
     public Track() {
         checkpoints = new ArrayList<>();
@@ -31,23 +34,18 @@ public class Track {
         this.name = name;
     }
 
-    public TrackLocation getDeparture() {
-        return departure;
-    }
-
-    public void setDeparture(TrackLocation departure) {
-        this.departure = departure;
-    }
-
     public List<Checkpoint> getCheckpoints() {
         return checkpoints;
     }
 
-    public boolean addCheckpoint(Checkpoint checkpoint) {
+    public void setCheckpoints(List<Checkpoint> checkpoints) {
+        this.checkpoints = checkpoints;
+    }
+
+    public void addCheckpoint(Checkpoint checkpoint) {
         if (checkpoint != null) {
-            return checkpoints.add(checkpoint);
+            checkpoints.add(checkpoint);
         }
-        return false;
     }
 
     public boolean removeCheckpoint(Checkpoint checkpoint) {

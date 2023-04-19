@@ -30,7 +30,7 @@ public class CommandTrack implements TabExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (strings.length == 0) {
             if (commandSender instanceof Player player) {
-                for (Track track : Racing.getInstance().getTracks()) {
+                for (Track track : Racing.tracks) {
                     if (track.getMapId().equals(player.getWorld().getName())) {
                         player.sendMessage("Course " + (track.getName()));
                     }

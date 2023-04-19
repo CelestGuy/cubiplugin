@@ -15,7 +15,7 @@ public class CommandGameTrack implements TabExecutor {
         if (strings.length == 1) {
             String arg = strings[0];
 
-            for (Track track : Racing.getInstance().getTracks()) {
+            for (Track track : Racing.tracks) {
                 if (arg.equals(track.getName())) {
                     Racing.getInstance().setTrack(track);
                     commandSender.sendMessage("La course choisie est : " + track.getName());
@@ -33,7 +33,7 @@ public class CommandGameTrack implements TabExecutor {
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
         if (strings.length == 1) {
             ArrayList<String> tracksName = new ArrayList<>();
-            for (Track track : Racing.getInstance().getTracks()) {
+            for (Track track : Racing.tracks) {
                 tracksName.add(track.getName());
             }
 

@@ -1,23 +1,45 @@
 package net.ddns.lagarderie.cubiplugin.utils;
 
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
+import net.ddns.lagarderie.cubiplugin.game.Checkpoint;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import net.ddns.lagarderie.cubiplugin.game.Track;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class TrackUtils {
     public static Track getTrack(String trackId) throws RacingGameException {
-        for (Track track : Racing.getInstance().getTracks()) {
+        for (Track track : Racing.tracks) {
             if (track.getMapId().equals(trackId)) {
                 return track;
             }
         }
 
         throw new RacingGameException("Cet id de course n'existe pas.");
+    }
+
+    public static List<Checkpoint> getCheckpointsNearPlayer(Player player, Track track, int maxDistance) {
+        ArrayList<Checkpoint> checkpoints = new ArrayList<>();
+
+        Vector playerLocation = player.getLocation().toVector();
+        int maxDistanceSquared = maxDistance * maxDistance;
+
+
+        for (Checkpoint checkpoint : track.getCheckpoints()) {
+            Vector checkpointLocation = checkpoint.getTrackLocation().clone().toVector();
+
+            if (playerLocation.clone().subtract(checkpointLocation).lengthSquared() <= maxDistanceSquared) {
+                checkpoints.add(checkpoint);
+            }
+        }
+
+        return checkpoints;
     }
 
     public static ArrayList<Track> loadTracks() {

@@ -1,13 +1,16 @@
 package net.ddns.lagarderie.cubiplugin.game;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Checkpoint {
     private TrackLocation trackLocation;
-    private int value;
+    private Set<Integer> childCheckpoints;
     private float radius;
 
     public Checkpoint() {
         trackLocation = null;
-        value = 0;
+        childCheckpoints = new HashSet<>();
         radius = 1f;
     }
 
@@ -19,12 +22,12 @@ public class Checkpoint {
         this.trackLocation = trackLocation;
     }
 
-    public int getValue() {
-        return value;
+    public Set<Integer> getChildCheckpoints() {
+        return childCheckpoints;
     }
 
-    public void setValue(int value) {
-        this.value = value;
+    public void setChildCheckpoints(Set<Integer> childCheckpoints) {
+        this.childCheckpoints = childCheckpoints;
     }
 
     public void setRadius(float radius) {
@@ -40,6 +43,17 @@ public class Checkpoint {
         return "Checkpoint (" +
                 "§4" + trackLocation.getX() +
                 "§r/§2" + trackLocation.getY() +
-                "§r/§9" + trackLocation.getZ() + "§r) de valeur §c" + value + "§r et de rayon §c" + radius + "§r";
+                "§r/§9" + trackLocation.getZ() +
+                "§r) de rayon §c" + radius +
+                "§r, prochains checkpoints : " + childCheckpoints.toString();
+    }
+
+    public void addChildCheckpoint(int value) {
+        this.childCheckpoints.add(value);
+    }
+
+    public void removeChildCheckpoint(int value) {
+        Integer val = value;
+        this.childCheckpoints.remove(val);
     }
 }

@@ -18,7 +18,7 @@ public class CommandCheckpointList implements TabExecutor {
         if (commandSender instanceof Player player) {
             String worldName = player.getWorld().getName();
 
-            for (Track track : Racing.getInstance().getTracks()) {
+            for (Track track : Racing.tracks) {
                 if (track.getMapId().equals(worldName)) {
                     List<Checkpoint> checkpoints = track.getCheckpoints();
                     int checkpointsCount = checkpoints.size();
@@ -30,11 +30,11 @@ public class CommandCheckpointList implements TabExecutor {
                             Checkpoint checkpoint = checkpoints.get(i);
                             TrackLocation location = checkpoint.getTrackLocation();
 
-                            player.sendMessage("Checkpoint §d" + (i + 1) + "§r (" +
+                            player.sendMessage("Checkpoint §d" + i + "§r (" +
                                     "§4" + location.getX() +
                                     "§r/§2" + location.getY() +
                                     "§r/§9" + location.getZ() + "§r) avec de valeur " +
-                                    "" + checkpoint.getValue()
+                                    "" + checkpoint.getChildCheckpoints()
                             );
                         }
 

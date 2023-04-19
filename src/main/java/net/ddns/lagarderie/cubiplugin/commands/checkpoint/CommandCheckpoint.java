@@ -1,28 +1,25 @@
 package net.ddns.lagarderie.cubiplugin.commands.checkpoint;
 
-import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static net.ddns.lagarderie.cubiplugin.utils.CommandUtils.getStrings;
 import static net.ddns.lagarderie.cubiplugin.utils.CommandUtils.handleCommand;
 
 public class CommandCheckpoint implements TabExecutor {
-    private static final Map<String, TabExecutor> commandArgs = new HashMap<>();
+    private static final HashMap<String, TabExecutor> commandArgs = new HashMap<>();
 
     public CommandCheckpoint() {
         commandArgs.put("add", new CommandCheckpointAdd());
-        commandArgs.put("draw", new CommandCheckpointDraw());
+        commandArgs.put("autoPlace", new CommandCheckpointAutoPlace());
         commandArgs.put("list", new CommandCheckpointList());
         commandArgs.put("radius", new CommandCheckpointRadius());
         commandArgs.put("remove", new CommandCheckpointRemove());
-        commandArgs.put("value", new CommandCheckpointValue());
+        commandArgs.put("nextCheckpoint", new CommandCheckpointNextCheckpoint());
     }
 
     @Override

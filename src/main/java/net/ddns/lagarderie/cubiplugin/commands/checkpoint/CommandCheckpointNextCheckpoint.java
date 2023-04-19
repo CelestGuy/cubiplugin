@@ -14,7 +14,7 @@ import java.util.List;
 import static net.ddns.lagarderie.cubiplugin.utils.CheckpointUtils.getClosestCheckpoint;
 import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.getTrack;
 
-public class CommandCheckpointValue implements TabExecutor {
+public class CommandCheckpointNextCheckpoint implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player && strings.length == 1) {
@@ -32,8 +32,11 @@ public class CommandCheckpointValue implements TabExecutor {
                 throw new RacingCommandException(e.getMessage());
             }
 
-            checkpoint.setValue(value);
-            player.sendMessage("Valeur du checkpoint : " + checkpoint);
+            if (checkpoint != null) {
+                checkpoint.addChildCheckpoint(value);
+                player.sendMessage("Prochain checkpoint à atteindre : " + checkpoint);
+            }
+
             return true;
         }
 

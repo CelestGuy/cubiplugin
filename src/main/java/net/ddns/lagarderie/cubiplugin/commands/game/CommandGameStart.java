@@ -12,7 +12,6 @@ public class CommandGameStart implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         try {
-            Racing.getInstance().init();
             Racing.getInstance().start();
             return true;
         } catch (Exception e) {

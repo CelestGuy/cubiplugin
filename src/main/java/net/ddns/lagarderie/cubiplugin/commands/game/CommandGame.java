@@ -16,6 +16,7 @@ public class CommandGame implements TabExecutor {
 
     public CommandGame() {
         commandArgs.put("start", new CommandGameStart());
+        commandArgs.put("stop", new CommandGameStop());
         commandArgs.put("speed", new CommandGameSpeed());
         commandArgs.put("laps", new CommandGameLaps());
         commandArgs.put("track", new CommandGameTrack());

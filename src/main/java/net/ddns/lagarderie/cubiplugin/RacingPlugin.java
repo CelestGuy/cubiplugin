@@ -1,11 +1,9 @@
 package net.ddns.lagarderie.cubiplugin;
 
 import net.ddns.lagarderie.cubiplugin.commands.checkpoint.CommandCheckpoint;
-import net.ddns.lagarderie.cubiplugin.commands.departure.CommandDeparture;
 import net.ddns.lagarderie.cubiplugin.commands.game.CommandGame;
 import net.ddns.lagarderie.cubiplugin.commands.track.CommandTrack;
 import net.ddns.lagarderie.cubiplugin.modes.RacingMode;
-import net.ddns.lagarderie.cubiplugin.modes.TrackDebugMode;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,18 +46,21 @@ public class RacingPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("game")).setExecutor(new CommandGame());
         Objects.requireNonNull(getCommand("track")).setExecutor(new CommandTrack());
         Objects.requireNonNull(getCommand("checkpoint")).setExecutor(new CommandCheckpoint());
-        Objects.requireNonNull(getCommand("departure")).setExecutor(new CommandDeparture());
     }
 
     @Override
     public void onDisable() {
-        saveTracks(Racing.getInstance().getTracks());
+        saveTracks(Racing.tracks);
     }
 
     public boolean startMode(String playerName, RacingMode mode) {
         RacingMode actualMode = modes.get(playerName);
 
         if (actualMode != mode) {
+            if (actualMode != null) {
+                actualMode.stop();
+            }
+
             modes.put(playerName, mode);
             mode.start();
             return true;

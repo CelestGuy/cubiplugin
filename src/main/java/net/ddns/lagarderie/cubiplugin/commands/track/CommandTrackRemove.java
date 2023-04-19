@@ -16,9 +16,9 @@ public class CommandTrackRemove implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
-            for (Track track : Racing.getInstance().getTracks()) {
+            for (Track track : Racing.tracks) {
                 if (track.getMapId().equals(player.getWorld().getName())) {
-                    if (Racing.getInstance().getTracks().remove(track)) {
+                    if (Racing.tracks.remove(track)) {
                         player.sendMessage("La course a été supprimée");
 
                         saveTrack(track);
