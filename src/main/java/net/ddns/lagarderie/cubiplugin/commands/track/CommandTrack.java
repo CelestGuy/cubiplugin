@@ -24,6 +24,8 @@ public class CommandTrack implements TabExecutor {
         commandArgs.put("debug", new CommandTrackDebug());
         commandArgs.put("list", new CommandTrackList());
         commandArgs.put("remove", new CommandTrackRemove());
+        commandArgs.put("departure", new CommandTrackDeparture());
+        commandArgs.put("arrival", new CommandTrackArrival());
     }
 
     @Override

@@ -34,6 +34,15 @@ public class CommandCheckpointAdd implements TabExecutor {
             tl.setPitch(player.getLocation().getPitch());
             tl.setYaw(player.getLocation().getYaw());
 
+            int maxId = -1;
+            for (Checkpoint c : track.getCheckpoints()) {
+                if (c.getId() > maxId) {
+                    maxId = c.getId();
+                }
+            }
+
+            checkpoint.setId(maxId + 1);
+
             checkpoint.setTrackLocation(tl);
 
             track.getCheckpoints().add(checkpoint);

@@ -46,10 +46,18 @@ public class CheckpointAutoPlaceMode implements RacingMode {
                     throw new RuntimeException(e);
                 }
 
+                int maxId = -1;
+                for (Checkpoint checkpoint : track.getCheckpoints()) {
+                    if (checkpoint.getId() > maxId) {
+                        maxId = checkpoint.getId();
+                    }
+                }
+
                 if (closestCheckpoint == null || !isPlayerInCheckpoint(player, closestCheckpoint)) {
                     Checkpoint newCheckpoint = new Checkpoint();
                     newCheckpoint.setTrackLocation(getNewLocation(player.getLocation()));
                     newCheckpoint.setRadius(defaultCheckpointRadius);
+                    newCheckpoint.setId(maxId + 1);
 
                     if (closestCheckpoint != null) {
                         closestCheckpoint.addChildCheckpoint(track.getCheckpoints().size());

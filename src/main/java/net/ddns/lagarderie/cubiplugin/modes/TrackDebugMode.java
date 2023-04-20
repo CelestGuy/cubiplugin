@@ -54,6 +54,13 @@ public class TrackDebugMode implements RacingMode {
 
                     for (Checkpoint checkpoint : getCheckpointsNearPlayer(player, track, 16)) {
                         Color color = Color.AQUA;
+
+                        if (checkpoint.getId() == track.getDepartureCheckpoint()) {
+                            color = Color.GREEN;
+                        } else if (checkpoint.getId() == track.getArrivalCheckpoint()) {
+                            color = Color.RED;
+                        }
+
                         if (checkpoint == playersClosestCheckpoint) {
                             color = Color.YELLOW;
                         }

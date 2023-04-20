@@ -34,7 +34,7 @@ public class CommandCheckpointList implements TabExecutor {
                                     "§4" + location.getX() +
                                     "§r/§2" + location.getY() +
                                     "§r/§9" + location.getZ() + "§r) avec de valeur " +
-                                    "" + checkpoint.getChildCheckpoints()
+                                    "" + checkpoint.getChildren()
                             );
                         }
 

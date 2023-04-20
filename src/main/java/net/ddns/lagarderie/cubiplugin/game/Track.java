@@ -3,16 +3,12 @@ package net.ddns.lagarderie.cubiplugin.game;
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
 
 import java.util.ArrayList;
-import java.util.List;
-
 public class Track {
     private String mapId;
     private String name;
-    private List<Checkpoint> checkpoints;
-
     private int departureCheckpoint;
     private int arrivalCheckpoint;
-
+    private ArrayList<Checkpoint> checkpoints;
 
     public Track() {
         checkpoints = new ArrayList<>();
@@ -34,12 +30,28 @@ public class Track {
         this.name = name;
     }
 
-    public List<Checkpoint> getCheckpoints() {
+    public ArrayList<Checkpoint> getCheckpoints() {
         return checkpoints;
     }
 
-    public void setCheckpoints(List<Checkpoint> checkpoints) {
+    public void setCheckpoints(ArrayList<Checkpoint> checkpoints) {
         this.checkpoints = checkpoints;
+    }
+
+    public int getDepartureCheckpoint() {
+        return departureCheckpoint;
+    }
+
+    public void setDepartureCheckpoint(int departureCheckpoint) {
+        this.departureCheckpoint = departureCheckpoint;
+    }
+
+    public int getArrivalCheckpoint() {
+        return arrivalCheckpoint;
+    }
+
+    public void setArrivalCheckpoint(int arrivalCheckpoint) {
+        this.arrivalCheckpoint = arrivalCheckpoint;
     }
 
     public void addCheckpoint(Checkpoint checkpoint) {
@@ -60,5 +72,15 @@ public class Track {
             throw new RacingGameException("L'index ne peut être négatif ou supérieur au nombre total de checkpoints");
         }
         return checkpoints.remove(index);
+    }
+
+    public Checkpoint getCheckpoint(Integer id) {
+        for (Checkpoint c : checkpoints) {
+            if (c.getId() == id) {
+                return c;
+            }
+        }
+
+        return null;
     }
 }
