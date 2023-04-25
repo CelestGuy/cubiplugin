@@ -1,6 +1,7 @@
 package net.ddns.lagarderie.cubiplugin.utils;
 
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -22,9 +23,10 @@ public class CommandUtils {
                     try {
                         return commandArgs.get(strings[0]).onCommand(commandSender, command, s, args);
                     } catch (RacingCommandException e) {
-                        player.sendMessage("§c" + e.getMessage() + "§r");
-                        return false;
+                        player.sendMessage(e.getMessage());
                     }
+                } else {
+                    player.sendMessage(ChatColor.RED + "Cet argument n'existe pas !" + ChatColor.RESET);
                 }
             }
         }

@@ -1,6 +1,7 @@
 package net.ddns.lagarderie.cubiplugin.game;
 
 import net.ddns.lagarderie.cubiplugin.RacingPlugin;
+import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -19,17 +20,21 @@ import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.loadTracks;
 import static org.bukkit.Bukkit.getServer;
 
 public class Racing {
-    private static Racing instance = null;
     public static final ArrayList<Track> tracks = loadTracks();
+    private static Racing instance = null;
 
-    private final HashSet<UUID> players;
-    private Track track = null;
-    private int speed = 150;
-    private int lapCount = 3;
-    private boolean running = false;
+    private LinkedList<RacingPlayer> racingPlayers;
+    private Track track;
+    private int speed;
+    private int lapCount;
+    private boolean running;
 
     private Racing() {
-        players = new HashSet<>();
+        this.racingPlayers = new LinkedList<>();
+        this.track = null;
+        this.speed = 100;
+        this.lapCount = 3;
+        this.running = false;
     }
 
     public static Racing getInstance() {
@@ -39,8 +44,10 @@ public class Racing {
         return instance;
     }
 
-    public void start() {
-        running = true;
+    public void start() throws RacingGameException {
+        this.running = true;
+        this.racingPlayers = new LinkedList<>();
+
         World world = getServer().getWorld(track.getMapId());
 
         BukkitScheduler scheduler = Bukkit.getScheduler();
@@ -49,7 +56,7 @@ public class Racing {
         final int[] counter = {0};
 
         for (Player player : getServer().getOnlinePlayers()) {
-            players.add(player.getUniqueId());
+            racingPlayers.add(new RacingPlayer(player.getUniqueId()));
         }
 
         scheduler.runTaskTimer(RacingPlugin.getInstance(), counterTask -> {
@@ -62,9 +69,10 @@ public class Racing {
                 if (track.getCheckpoints().size() > 0) {
                     firstCheckpoint = track.getCheckpoints().get(0);
 
-                    for (UUID playerUuid : players) {
+                    for (RacingPlayer racingPlayer : racingPlayers) {
+                        UUID playerUuid = racingPlayer.getUuid();
                         Player player = getServer().getPlayer(playerUuid);
-                        Location location = firstCheckpoint.getTrackLocation().clone();
+                        Location location = firstCheckpoint.getLocation().clone();
                         location.setWorld(world);
 
                         if (player != null) {
@@ -77,7 +85,7 @@ public class Racing {
                 }
 
                 counter[0] += 5;
-                running = !players.isEmpty();
+                running = !racingPlayers.isEmpty();
 
                 if (counter[0] % 20 == 0) {
                     timer[0]--;
@@ -93,12 +101,9 @@ public class Racing {
 
         final int[] counter = {0};
 
-        HashMap<UUID, Integer> playersPoints = new HashMap<>();
-        HashMap<UUID, Integer> playersCheckedCheckpoints = new HashMap<>();
-
-        for (UUID playerUuid : players) {
-            playersPoints.put(playerUuid, 0);
-            playersCheckedCheckpoints.put(playerUuid, 0);
+        for (RacingPlayer racingPlayer : racingPlayers) {
+            racingPlayer.setCheckedLaps(0);
+            racingPlayer.setCheckedCheckpoints(0);
         }
 
         float trackLength = getShortestDistance(track, track.getCheckpoint(track.getDepartureCheckpoint()), track.getCheckpoint(track.getArrivalCheckpoint()));
@@ -107,11 +112,13 @@ public class Racing {
             if (!running || world == null) {
                 gameTask.cancel();
             } else {
-                ArrayList<PlayerDistance> playerDistances = getPlayersPositions(trackLength, playersPoints);
+                sortPlayers(trackLength);
+                RacingPlayer[] rps = new RacingPlayer[racingPlayers.size()];
+                racingPlayers.toArray(rps);
 
-                for (int i = 0; i < playerDistances.size(); i++) {
-                    PlayerDistance playerDistance = playerDistances.get(i);
-                    Player player = getServer().getPlayer(playerDistance.getUuid());
+                for (int i = 0; i < rps.length; i++) {
+                    RacingPlayer racingPlayer = rps[i];
+                    Player player = getServer().getPlayer(racingPlayer.getUuid());
 
                     if (player != null) {
                         Block block = world.getBlockAt(player.getLocation().subtract(new Vector(0, 1, 0)));
@@ -123,59 +130,52 @@ public class Racing {
                                 int boostedSpeedEffect = Math.min((speedEffect + 5), 255);
                                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 10, boostedSpeedEffect, false));
                             }
-                            case GREEN_CONCRETE -> {
-                                player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 5, 5, false));
-                            }
-                            case MAGENTA_CONCRETE -> {
-                                player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 5, 15, false));
-                            }
-                            default -> {
-                                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1, speedEffect, false));
-                            }
+                            case GREEN_CONCRETE -> player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 5, 5, false));
+                            case MAGENTA_CONCRETE -> player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 5, 15, false));
+                            default -> player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1, speedEffect, false));
                         }
 
                         String playerTime = String.format(Locale.US, "%.2f", (counter[0] / 20f));
 
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
-                                (i + 1) + "e - " + playerDistance.getDistance() + " - Temps : " + playerTime + " s"
+                                (i + 1) + "e - " + racingPlayer.getDistance() + " - Temps : " + playerTime + " s"
                         ));
 
                         // validate checkpoints
 
                         Checkpoint nearestCheckpoint = getClosestCheckpoint(player, track);
-                        Checkpoint validatedCheckpoint = track.getCheckpoint(playersCheckedCheckpoints.get(playerDistance.getUuid()));
+                        Checkpoint validatedCheckpoint = track.getCheckpoint(racingPlayer.getCheckedCheckpoints());
 
                         if (nearestCheckpoint != null) {
                             for (Integer childId : validatedCheckpoint.getChildren()) {
                                 if (nearestCheckpoint.getId() == childId) {
-                                    playersCheckedCheckpoints.put(playerDistance.getUuid(), childId);
+                                    racingPlayer.setCheckedCheckpoints(childId);
                                     if (childId == track.getDepartureCheckpoint()) {
-                                        int lap = playersPoints.get(playerDistance.getUuid()) + 1;
-                                        playersPoints.put(playerDistance.getUuid(), lap);
+                                        int lap = racingPlayer.getCheckedLaps() + 1;
+                                        racingPlayer.setCheckedLaps(lap);
                                         player.sendTitle((lap + 1) + "e tour", "", 10, 40, 10);
                                     }
-                                    player.sendMessage(childId + " Validé");
                                     break;
                                 }
                             }
                         }
                     } else {
-                        players.remove(playerDistance.getUuid());
+                        racingPlayers.remove(racingPlayer);
                     }
                 }
 
                 counter[0]++;
-                running = !havePlayersFinished(playersPoints);
+                running = !havePlayersFinished();
             }
         }, 0L, 1L);
     }
 
-    private ArrayList<PlayerDistance> getPlayersPositions(float trackLength, HashMap<UUID, Integer> playersPoints) {
-        ArrayList<PlayerDistance> playerDistances = new ArrayList<>();
-
+    private void sortPlayers(float trackLength) {
         Checkpoint arrival = track.getCheckpoint(track.getArrivalCheckpoint());
 
-        for (UUID playerUuid : players) {
+        for (RacingPlayer racingPlayer : racingPlayers) {
+            UUID playerUuid = racingPlayer.getUuid();
+
             Player player = getServer().getPlayer(playerUuid);
             Checkpoint nearestCheckpoint = getClosestCheckpoint(player, track);
 
@@ -183,22 +183,20 @@ public class Racing {
                 float d = getShortestDistance(track, nearestCheckpoint, arrival);
 
                 Vector playerPos = player.getLocation().toVector();
-                Vector checkpoint = nearestCheckpoint.getTrackLocation().toVector();
+                Vector checkpoint = nearestCheckpoint.getLocation().toVector();
 
-                d += playerPos.subtract(checkpoint).length() + (lapCount - (playersPoints.get(playerUuid))) * trackLength;
+                d += playerPos.subtract(checkpoint).length() + (lapCount - (racingPlayer.getCheckedLaps())) * trackLength;
 
-                playerDistances.add(new PlayerDistance(playerUuid, d));
+                racingPlayer.setDistance(d);
             }
         }
 
-        Collections.sort(playerDistances);
-
-        return playerDistances;
+        Collections.sort(racingPlayers);
     }
 
-    private boolean havePlayersFinished(HashMap<UUID, Integer> playersPoints) {
-        for (UUID playerUuid : playersPoints.keySet()) {
-            if (playersPoints.get(playerUuid) < lapCount) {
+    private boolean havePlayersFinished() {
+        for (RacingPlayer racingPlayer : racingPlayers) {
+            if (racingPlayer.getCheckedLaps() < lapCount) {
                 return false;
             }
         }
@@ -208,14 +206,6 @@ public class Racing {
 
     public void stop() {
         running = false;
-    }
-
-    public boolean addPlayer(Player player) {
-        return players.add(player.getUniqueId());
-    }
-
-    public boolean removePlayer(Player player) {
-        return players.remove(player.getUniqueId());
     }
 
     public void setTrack(Track track) {
@@ -240,5 +230,9 @@ public class Racing {
 
     public void setLapCount(int lapCount) {
         this.lapCount = lapCount;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

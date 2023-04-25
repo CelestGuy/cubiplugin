@@ -32,7 +32,7 @@ public class TrackUtils {
 
 
         for (Checkpoint checkpoint : track.getCheckpoints()) {
-            Vector checkpointLocation = checkpoint.getTrackLocation().clone().toVector();
+            Vector checkpointLocation = checkpoint.getLocation().clone().toVector();
 
             if (playerLocation.clone().subtract(checkpointLocation).lengthSquared() <= maxDistanceSquared) {
                 checkpoints.add(checkpoint);

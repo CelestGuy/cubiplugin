@@ -1,5 +1,6 @@
-package net.ddns.lagarderie.cubiplugin.commands.game;
+package net.ddns.lagarderie.cubiplugin.commands.subcommands;
 
+import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -25,14 +26,19 @@ public class CommandGameSpeed implements TabExecutor {
                 String arg = strings[0];
                 if (availableSpeeds.contains(arg)) {
                     int speed = Integer.parseInt(arg);
-                    Racing.getInstance().setSpeed(speed);
+                    Racing game = Racing.getInstance();
 
-                    String color = speedColor.get(availableSpeeds.indexOf(arg));
+                    if (game.isRunning()) {
+                        throw new RacingCommandException("Impossible de modifier les paramètres du jeu.");
+                    } else {
+                        game.setSpeed(speed);
 
-                    player.sendMessage("La vitesse de la course a été mise à " + color + speed + "§r !");
-                    return true;
+                        String color = speedColor.get(availableSpeeds.indexOf(arg));
+                        player.sendMessage("La vitesse de la course a été mise à " + color + speed + "§r !");
+                        return true;
+                    }
                 } else {
-                    player.sendMessage("§cLa vitesse n'existe pas.§r");
+                    throw new RacingCommandException("La vitesse n'existe pas.");
                 }
             }
         }

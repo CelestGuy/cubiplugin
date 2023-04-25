@@ -1,4 +1,4 @@
-package net.ddns.lagarderie.cubiplugin.commands.track;
+package net.ddns.lagarderie.cubiplugin.commands.subcommands;
 
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import net.ddns.lagarderie.cubiplugin.game.Track;

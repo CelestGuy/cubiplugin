@@ -1,10 +1,10 @@
-package net.ddns.lagarderie.cubiplugin.commands.checkpoint;
+package net.ddns.lagarderie.cubiplugin.commands.subcommands;
 
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
 import net.ddns.lagarderie.cubiplugin.game.Checkpoint;
 import net.ddns.lagarderie.cubiplugin.game.Track;
-import net.ddns.lagarderie.cubiplugin.game.TrackLocation;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static net.ddns.lagarderie.cubiplugin.utils.CheckpointUtils.getNewLocation;
 import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.getTrack;
 import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.saveTrack;
 
@@ -30,9 +29,10 @@ public class CommandCheckpointAdd implements TabExecutor {
             }
 
             Checkpoint checkpoint = new Checkpoint();
-            TrackLocation tl = getNewLocation(player.getLocation());
-            tl.setPitch(player.getLocation().getPitch());
-            tl.setYaw(player.getLocation().getYaw());
+            Location location = player.getLocation().clone();
+
+            location.setPitch(player.getLocation().getPitch());
+            location.setYaw(player.getLocation().getYaw());
 
             int maxId = -1;
             for (Checkpoint c : track.getCheckpoints()) {
@@ -43,7 +43,7 @@ public class CommandCheckpointAdd implements TabExecutor {
 
             checkpoint.setId(maxId + 1);
 
-            checkpoint.setTrackLocation(tl);
+            checkpoint.setLocation(location);
 
             track.getCheckpoints().add(checkpoint);
             player.sendMessage(checkpoint + "§a ajouté§r ! ");

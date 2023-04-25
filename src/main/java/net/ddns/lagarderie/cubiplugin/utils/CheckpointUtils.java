@@ -2,7 +2,6 @@ package net.ddns.lagarderie.cubiplugin.utils;
 
 import net.ddns.lagarderie.cubiplugin.game.Checkpoint;
 import net.ddns.lagarderie.cubiplugin.game.Track;
-import net.ddns.lagarderie.cubiplugin.game.TrackLocation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -10,9 +9,9 @@ import org.bukkit.util.Vector;
 import java.util.List;
 
 public class CheckpointUtils {
-    public static Checkpoint getCheckpoint(int index, Track track) {
-        if (index >= 0 && index < track.getCheckpoints().size()) {
-            return track.getCheckpoints().get(index);
+    public static Checkpoint getCheckpoint(Track track, int checkpointId) {
+        if (checkpointId >= 0 && checkpointId < track.getCheckpoints().size()) {
+            return track.getCheckpoints().get(checkpointId);
         }
 
         return null;
@@ -23,10 +22,10 @@ public class CheckpointUtils {
             List<Checkpoint> checkpoints = track.getCheckpoints();
 
             Checkpoint closestCheckpoint = checkpoints.get(0);
-            Vector closestCheckpointLocation = closestCheckpoint.getTrackLocation().clone().toVector();
+            Vector closestCheckpointLocation = closestCheckpoint.getLocation().clone().toVector();
 
             for (Checkpoint checkpoint : checkpoints) {
-                Vector checkpointLocation = checkpoint.getTrackLocation().clone().toVector();
+                Vector checkpointLocation = checkpoint.getLocation().clone().toVector();
                 Vector playerLocation = player.getLocation().clone().toVector();
 
                 double playerToClosestCheckpointSquaredLength = playerLocation.clone().subtract(closestCheckpointLocation).lengthSquared();
@@ -44,18 +43,10 @@ public class CheckpointUtils {
         return null;
     }
 
-    public static TrackLocation getNewLocation(Location currentLocation) {
-        currentLocation.setX((int) (currentLocation.getX()) + (0.5 * (currentLocation.getX() < 0 ? -1 : 1)));
-        currentLocation.setY((int) (currentLocation.getY()));
-        currentLocation.setZ((int) (currentLocation.getZ()) + (0.5 * (currentLocation.getZ() < 0 ? -1 : 1)));
-
-        return new TrackLocation(currentLocation.clone());
-    }
-
     public static boolean isPlayerInCheckpoint(Player player, Checkpoint checkpoint) {
         Vector playerLocation = player.getLocation().toVector();
 
-        Vector checkpointLocation = checkpoint.getTrackLocation().toVector();
+        Vector checkpointLocation = checkpoint.getLocation().toVector();
 
         return playerLocation.subtract(checkpointLocation).lengthSquared() <=
                 (checkpoint.getRadius() * checkpoint.getRadius());

@@ -11,8 +11,8 @@ import java.util.LinkedList;
 
 public class TrackGraph {
     public static float getDistance(Checkpoint a, Checkpoint b) {
-        Vector vecA = a.getTrackLocation().toVector();
-        Vector vecB = b.getTrackLocation().toVector();
+        Vector vecA = a.getLocation().toVector();
+        Vector vecB = b.getLocation().toVector();
 
         return (float) (vecA.clone().subtract(vecB).length());
     }

@@ -65,8 +65,8 @@ public class TrackDebugMode implements RacingMode {
                             color = Color.YELLOW;
                         }
 
-                        spawnRedstoneParticle(checkpoint.getTrackLocation(), color, 0.5f);
-                        drawCircle(checkpoint.getTrackLocation(), checkpoint.getRadius());
+                        spawnRedstoneParticle(checkpoint.getLocation(), color, 0.5f);
+                        drawCircle(checkpoint.getLocation(), checkpoint.getRadius());
                     }
                 }
             }

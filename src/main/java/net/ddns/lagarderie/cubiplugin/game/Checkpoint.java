@@ -1,26 +1,29 @@
 package net.ddns.lagarderie.cubiplugin.game;
 
+import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
+import org.bukkit.Location;
+
 import java.util.ArrayList;
 
 public class Checkpoint {
-    private boolean isIdSet;
+    private boolean idSet;
     private int id;
-    private TrackLocation trackLocation;
+    private Location location;
     private ArrayList<Integer> children;
     private float radius;
 
     public Checkpoint() {
         id = 0;
-        trackLocation = null;
+        location = null;
         children = new ArrayList<>();
         radius = 1f;
-        isIdSet = false;
+        idSet = false;
     }
 
     public void setId(int id) {
-        if (!isIdSet) {
+        if (!idSet) {
             this.id = id;
-            isIdSet = true;
+            idSet = true;
         }
     }
 
@@ -28,12 +31,12 @@ public class Checkpoint {
         return id;
     }
 
-    public TrackLocation getTrackLocation() {
-        return trackLocation;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setTrackLocation(TrackLocation trackLocation) {
-        this.trackLocation = trackLocation;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public ArrayList<Integer> getChildren() {
@@ -54,20 +57,29 @@ public class Checkpoint {
 
     @Override
     public String toString() {
-        return "Checkpoint " + id + " (" +
-                "§4" + trackLocation.getX() +
-                "§r/§2" + trackLocation.getY() +
-                "§r/§9" + trackLocation.getZ() +
+        return "Id " + id + " (" +
+                "§4" + location.getX() +
+                "§r/§2" + location.getY() +
+                "§r/§9" + location.getZ() +
                 "§r) de rayon §c" + radius +
                 "§r, checkpoints enfants : " + children.toString();
     }
 
-    public void addChildCheckpoint(int value) {
-        this.children.add(value);
+    public void addChildCheckpoint(int childId) throws RacingGameException {
+        if (childId < 0) {
+            throw new RacingGameException("L'id d'un checkpoint ne peut être négatif.");
+        }
+
+        Integer cId = childId;
+        this.children.add(cId);
     }
 
-    public void removeChildCheckpoint(int value) {
-        Integer val = value;
-        this.children.remove(val);
+    public void removeChildCheckpoint(int childId) throws RacingGameException {
+        if (childId < 0) {
+            throw new RacingGameException("L'id d'un checkpoint ne peut être négatif.");
+        }
+
+        Integer cId = childId;
+        this.children.remove(cId);
     }
 }

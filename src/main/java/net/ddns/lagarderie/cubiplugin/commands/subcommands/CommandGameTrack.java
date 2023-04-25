@@ -1,4 +1,4 @@
-package net.ddns.lagarderie.cubiplugin.commands.game;
+package net.ddns.lagarderie.cubiplugin.commands.subcommands;
 
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
@@ -17,13 +17,19 @@ public class CommandGameTrack implements TabExecutor {
 
             for (Track track : Racing.tracks) {
                 if (arg.equals(track.getName())) {
-                    Racing.getInstance().setTrack(track);
-                    commandSender.sendMessage("La course choisie est : " + track.getName());
-                    return true;
+                    Racing game = Racing.getInstance();
+
+                    if (game.isRunning()) {
+                        throw new RacingCommandException("Impossible de modifier les paramètres du jeu.");
+                    } else {
+                        game.setTrack(track);
+                        commandSender.sendMessage("Course choisie : " + track.getName());
+                        return true;
+                    }
                 }
             }
 
-            throw new RacingCommandException("La course n'existe pas");
+            throw new RacingCommandException("La course n'existe pas.");
         }
 
         return false;

@@ -1,4 +1,4 @@
-package net.ddns.lagarderie.cubiplugin.commands.game;
+package net.ddns.lagarderie.cubiplugin.commands.subcommands;
 
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
@@ -12,8 +12,15 @@ public class CommandGameStop implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         try {
-            Racing.getInstance().stop();
-            return true;
+            Racing game = Racing.getInstance();
+
+            if (!game.isRunning()) {
+                throw new RacingCommandException("Un jeu n'est pas en cours.");
+            } else {
+                game.stop();
+                commandSender.sendMessage("Jeu arrêté.");
+                return true;
+            }
         } catch (Exception e) {
             throw new RacingCommandException(e.getMessage());
         }

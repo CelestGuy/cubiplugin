@@ -1,4 +1,4 @@
-package net.ddns.lagarderie.cubiplugin.commands.checkpoint;
+package net.ddns.lagarderie.cubiplugin.commands.subcommands;
 
 import net.ddns.lagarderie.cubiplugin.RacingPlugin;
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;

@@ -1,8 +1,9 @@
 package net.ddns.lagarderie.cubiplugin;
 
-import net.ddns.lagarderie.cubiplugin.commands.checkpoint.CommandCheckpoint;
-import net.ddns.lagarderie.cubiplugin.commands.game.CommandGame;
-import net.ddns.lagarderie.cubiplugin.commands.track.CommandTrack;
+import net.ddns.lagarderie.cubiplugin.commands.CommandCheckpoint;
+import net.ddns.lagarderie.cubiplugin.commands.CommandChildren;
+import net.ddns.lagarderie.cubiplugin.commands.CommandGame;
+import net.ddns.lagarderie.cubiplugin.commands.CommandTrack;
 import net.ddns.lagarderie.cubiplugin.modes.RacingMode;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,7 +32,6 @@ public class RacingPlugin extends JavaPlugin {
     public void onLoad() {
         Thread.currentThread().setContextClassLoader(this.getClassLoader());
 
-        // Vérifie les fichiers de configuration du plugin
         if (new File("./plugins/racing").mkdir()) {
             getLogger().log(Level.INFO, "Création du dossier de configuration du plugin");
         }
@@ -46,6 +46,7 @@ public class RacingPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("game")).setExecutor(new CommandGame());
         Objects.requireNonNull(getCommand("track")).setExecutor(new CommandTrack());
         Objects.requireNonNull(getCommand("checkpoint")).setExecutor(new CommandCheckpoint());
+        Objects.requireNonNull(getCommand("children")).setExecutor(new CommandChildren());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package net.ddns.lagarderie.cubiplugin.commands.track;
+package net.ddns.lagarderie.cubiplugin.commands.subcommands;
 
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
@@ -18,8 +18,9 @@ public class CommandTrackArrival implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
-            Track track = null;
-            Checkpoint checkpoint = null;
+            Track track;
+            Checkpoint checkpoint;
+
             try {
                 track = getTrack(player.getWorld().getName());
                 checkpoint = getClosestCheckpoint(player, track);

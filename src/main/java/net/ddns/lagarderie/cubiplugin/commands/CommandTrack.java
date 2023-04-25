@@ -1,6 +1,7 @@
-package net.ddns.lagarderie.cubiplugin.commands.track;
+package net.ddns.lagarderie.cubiplugin.commands;
 
 
+import net.ddns.lagarderie.cubiplugin.commands.subcommands.*;
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import net.ddns.lagarderie.cubiplugin.game.Track;
@@ -17,15 +18,17 @@ import static net.ddns.lagarderie.cubiplugin.utils.CommandUtils.getStrings;
 import static net.ddns.lagarderie.cubiplugin.utils.CommandUtils.handleCommand;
 
 public class CommandTrack implements TabExecutor {
-    private static final Map<String, TabExecutor> commandArgs = new HashMap<>();
+    private final Map<String, TabExecutor> subCommands;
 
     public CommandTrack() {
-        commandArgs.put("create", new CommandTrackCreate());
-        commandArgs.put("debug", new CommandTrackDebug());
-        commandArgs.put("list", new CommandTrackList());
-        commandArgs.put("remove", new CommandTrackRemove());
-        commandArgs.put("departure", new CommandTrackDeparture());
-        commandArgs.put("arrival", new CommandTrackArrival());
+        subCommands = new HashMap<>();
+
+        subCommands.put("create", new CommandTrackCreate());
+        subCommands.put("debug", new CommandTrackDebug());
+        subCommands.put("list", new CommandTrackList());
+        subCommands.put("remove", new CommandTrackRemove());
+        subCommands.put("departure", new CommandTrackDeparture());
+        subCommands.put("arrival", new CommandTrackArrival());
     }
 
     @Override
@@ -35,6 +38,7 @@ public class CommandTrack implements TabExecutor {
                 for (Track track : Racing.tracks) {
                     if (track.getMapId().equals(player.getWorld().getName())) {
                         player.sendMessage("Course " + (track.getName()));
+                        return true;
                     }
                 }
 
@@ -42,11 +46,11 @@ public class CommandTrack implements TabExecutor {
             }
         }
 
-        return handleCommand(commandSender, command, s, strings, commandArgs);
+        return handleCommand(commandSender, command, s, strings, subCommands);
     }
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        return getStrings(commandSender, command, s, strings, commandArgs);
+        return getStrings(commandSender, command, s, strings, subCommands);
     }
 }

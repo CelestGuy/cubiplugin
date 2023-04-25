@@ -1,4 +1,4 @@
-package net.ddns.lagarderie.cubiplugin.commands.track;
+package net.ddns.lagarderie.cubiplugin.commands.subcommands;
 
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
@@ -12,24 +12,27 @@ import java.util.List;
 
 import static net.ddns.lagarderie.cubiplugin.utils.TrackUtils.saveTrack;
 
-public class CommandTrackCreate implements TabExecutor {
+public class CommandTrackRemove implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
-            Track track = new Track();
-            track.setMapId(player.getWorld().getName());
-            track.setName(player.getWorld().getName());
+            for (Track track : Racing.tracks) {
+                if (track.getMapId().equals(player.getWorld().getName())) {
+                    if (Racing.tracks.remove(track)) {
+                        player.sendMessage("La course a été supprimée");
 
-            if (Racing.tracks.add(track)) {
-                player.sendMessage("La course a été créée");
-            } else {
-                throw new RacingCommandException("Une erreur est survenue lors de la création de la course");
+                        saveTrack(track);
+                        return true;
+                    } else {
+                        throw new RacingCommandException("Une erreur est survenue lors de la suppression de la course");
+                    }
+                }
             }
 
-            saveTrack(track);
+            throw new RacingCommandException("Ce monde ne contient pas de fichier de course.");
         }
 
-        return true;
+        return false;
     }
 
     @Override

@@ -9,7 +9,7 @@ commands:
     description: Paramétrage de la partie
   checkpoint:
     description: Paramétrage des checkpoints d'une course
-  departure:
-    description: Paramétrage de la ligne de départ d'une course
+  children:
+    description: Gestion des successeurs d'un checkpoint
   track:
     description: Paramétrage d'une course

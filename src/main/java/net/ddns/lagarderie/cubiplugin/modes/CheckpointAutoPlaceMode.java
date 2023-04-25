@@ -1,6 +1,7 @@
 package net.ddns.lagarderie.cubiplugin.modes;
 
 import net.ddns.lagarderie.cubiplugin.RacingPlugin;
+import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingGameException;
 import net.ddns.lagarderie.cubiplugin.game.Checkpoint;
 import net.ddns.lagarderie.cubiplugin.game.Track;
@@ -55,12 +56,16 @@ public class CheckpointAutoPlaceMode implements RacingMode {
 
                 if (closestCheckpoint == null || !isPlayerInCheckpoint(player, closestCheckpoint)) {
                     Checkpoint newCheckpoint = new Checkpoint();
-                    newCheckpoint.setTrackLocation(getNewLocation(player.getLocation()));
+                    newCheckpoint.setLocation(player.getLocation().clone());
                     newCheckpoint.setRadius(defaultCheckpointRadius);
                     newCheckpoint.setId(maxId + 1);
 
                     if (closestCheckpoint != null) {
-                        closestCheckpoint.addChildCheckpoint(track.getCheckpoints().size());
+                        try {
+                            closestCheckpoint.addChildCheckpoint(track.getCheckpoints().size());
+                        } catch (RacingGameException e) {
+                            throw new RacingCommandException(e.getMessage());
+                        }
                     }
 
                     track.addCheckpoint(newCheckpoint);

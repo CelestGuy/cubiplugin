@@ -1,10 +1,10 @@
-package net.ddns.lagarderie.cubiplugin.commands.checkpoint;
+package net.ddns.lagarderie.cubiplugin.commands.subcommands;
 
 import net.ddns.lagarderie.cubiplugin.exceptions.RacingCommandException;
 import net.ddns.lagarderie.cubiplugin.game.Checkpoint;
 import net.ddns.lagarderie.cubiplugin.game.Racing;
 import net.ddns.lagarderie.cubiplugin.game.Track;
-import net.ddns.lagarderie.cubiplugin.game.TrackLocation;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -28,7 +28,7 @@ public class CommandCheckpointList implements TabExecutor {
 
                         for (int i = 0; i < checkpointsCount; i++) {
                             Checkpoint checkpoint = checkpoints.get(i);
-                            TrackLocation location = checkpoint.getTrackLocation();
+                            Location location = checkpoint.getLocation().clone();
 
                             player.sendMessage("Checkpoint §d" + i + "§r (" +
                                     "§4" + location.getX() +
