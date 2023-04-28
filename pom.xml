@@ -5,8 +5,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.ddns.lagarderie</groupId>
-    <artifactId>cubiplugin</artifactId>
+    <artifactId>racingplugin</artifactId>
     <version>0.1</version>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <outputDirectory>./srv/plugins</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -27,6 +40,11 @@
             <artifactId>spigot-api</artifactId>
             <version>1.18.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
         </dependency>
     </dependencies>
 </project>

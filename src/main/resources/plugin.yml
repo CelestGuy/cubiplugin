@@ -1,15 +1,31 @@
-name: cubiplugin
-description: Le Plugin Principal de la Garderie
-main: net.ddns.lagarderie.cubiplugin.RacingPlugin
+name: racingplugin
+description: Le Plugin des courses de la Garderie
+main: net.ddns.lagarderie.racingplugin.RacingPlugin
 version: 0.0.1
 api-version: '1.18'
 
 commands:
   game:
+    permission: op
+    permission-message: Vous n'avez pas les permissions d'exécuter cette commande
     description: Paramétrage de la partie
   checkpoint:
+    permission: op
+    permission-message: Vous n'avez pas les permissions d'exécuter cette commande
     description: Paramétrage des checkpoints d'une course
   children:
+    permission: op
+    permission-message: Vous n'avez pas les permissions d'exécuter cette commande
     description: Gestion des successeurs d'un checkpoint
   track:
-    description: Paramétrage d'une course
+    permission: op
+    permission-message: Vous n'avez pas les permissions d'exécuter cette commande
+    description: Gestion d'une course
+  autoplace:
+    permission: op
+    permission-message: Vous n'avez pas les permissions d'exécuter cette commande
+    description: Placement automatique des checkpoints
+  showcheckpoints:
+    permission: op
+    permission-message: Vous n'avez pas les permissions d'exécuter cette commande
+    description: Affichage des checkpoints
