@@ -2,6 +2,7 @@ package net.ddns.lagarderie.racingplugin.utils;
 
 import com.google.gson.Gson;
 import net.ddns.lagarderie.racingplugin.RacingPlugin;
+import net.ddns.lagarderie.racingplugin.game.PowerBlock;
 import net.ddns.lagarderie.racingplugin.plugin.RacingGameException;
 import net.ddns.lagarderie.racingplugin.game.Checkpoint;
 import net.ddns.lagarderie.racingplugin.game.Track;
@@ -11,13 +12,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class TrackUtils {
     public static Track getTrack(String trackId) throws RacingGameException {
-        for (Track track : RacingPlugin.getRacingPlugin().getTracks()) {
-            if (track.getMapId().equals(trackId)) {
+        for (Track track : RacingPlugin.getPlugin().getTracks()) {
+            if (track.getId().equals(trackId)) {
                 return track;
             }
         }
@@ -41,74 +41,6 @@ public class TrackUtils {
         }
 
         return checkpoints;
-    }
-
-    public static ArrayList<Track> loadTracks() {
-        ArrayList<Track> tracks = new ArrayList<>();
-
-        File tracksDir = new File("./plugins/racing/tracks/");
-        File[] files = tracksDir.listFiles();
-
-        if (files != null) {
-            for (File trackFile : files) {
-                try {
-                    FileReader reader = new FileReader(trackFile);
-
-                    Gson gson = new Gson();
-                    Track track = gson.fromJson(reader, Track.class);
-                    tracks.add(track);
-
-                    reader.close();
-                } catch (IOException e) {
-                    System.err.println("Impossible de charger la course " + trackFile.getName() + ": " + e);
-                }
-            }
-        } else {
-            System.err.println("Aucun fichier de courses dans le dossier");
-        }
-
-        return tracks;
-    }
-
-    public static void saveTrack(Track track) {
-        File trackFile = new File("./plugins/racing/tracks/" + track.getMapId() + ".json");
-
-        if (trackFile.exists()) {
-            if (trackFile.delete()) {
-                System.out.println("Les fichier de course a été écrasé");
-            } else {
-                System.err.println("Impossible de supprimer le fichier de course");
-            }
-        }
-
-        try {
-            Gson jo = new Gson();
-            String json = jo.toJson(track);
-            FileWriter file = new FileWriter(trackFile.getPath());
-
-            file.write(json);
-            file.flush();
-            file.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void saveTracks(ArrayList<Track> tracks) {
-        File tracksDir = new File("./plugins/racing/tracks/");
-        File[] files = tracksDir.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.delete()) {
-                    System.out.println("Les fichiers de courses ont été écrasés");
-                }
-            }
-
-            for (Track track : tracks) {
-                saveTrack(track);
-            }
-        }
     }
 
     public static float getDistance(Checkpoint a, Checkpoint b) {
@@ -191,5 +123,55 @@ public class TrackUtils {
         Vector position = checkpoint.getPosition();
 
         return new Location(world, position.getX(), position.getY(), position.getZ(), checkpoint.getYaw(), checkpoint.getPitch());
+    }
+
+    public static float getShortestDistance(Track track, Checkpoint a, Checkpoint b) {
+        // TODO : Enhance this cringe code
+
+        int aId = a.getId();
+        int bId = b.getId();
+
+        HashMap<Integer, Float> distances = new HashMap<>();
+        HashSet<Integer> marks = new HashSet<>();
+        LinkedList<Integer> file = new LinkedList<>();
+
+        for (int i = 0; i < track.getCheckpoints().size(); i++) {
+            distances.put(i, Float.MAX_VALUE);
+        }
+
+        file.add(aId);
+        distances.replace(aId, 0f);
+
+        while (!file.isEmpty()) {
+            double min = Double.POSITIVE_INFINITY;
+            int index = 0;
+            for (int i = 0; i < file.size(); i++) {
+                if (distances.get(file.get(i)) < min) {
+                    min = distances.get(file.get(i));
+                    index = i;
+                }
+            }
+            int cId = file.remove(index);
+            marks.add(cId);
+
+            Checkpoint c = track.getCheckpoint(cId);
+
+            for (Integer childId : c.getChildren()) {
+                Checkpoint child = track.getCheckpoint(childId);
+                float distance = distances.get(cId) + getDistance(c, child);
+
+                if (childId == bId) {
+                    distances.put(childId, distance);
+                    return distances.get(childId);
+                } else if (!file.contains(childId) && !marks.contains(childId)) {
+                    distances.put(childId, distance);
+                    file.add(childId);
+                } else if (distance < distances.get(childId)) {
+                    distances.replace(childId, distance);
+                }
+            }
+        }
+
+        return distances.get(bId);
     }
 }

@@ -3,7 +3,7 @@ package net.ddns.lagarderie.racingplugin.game;
 import java.util.ArrayList;
 
 public class Track {
-    private String mapId;
+    private String id;
     private String name;
     private int departureCheckpoint;
     private int arrivalCheckpoint;
@@ -13,12 +13,12 @@ public class Track {
         checkpoints = new ArrayList<>();
     }
 
-    public String getMapId() {
-        return mapId;
+    public String getId() {
+        return id;
     }
 
-    public void setMapId(String mapId) {
-        this.mapId = mapId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

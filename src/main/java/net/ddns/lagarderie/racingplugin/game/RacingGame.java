@@ -14,54 +14,54 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
-import static net.ddns.lagarderie.racingplugin.RacingPlugin.getRacingPlugin;
+import static net.ddns.lagarderie.racingplugin.RacingPlugin.getPlugin;
 import static net.ddns.lagarderie.racingplugin.utils.ParticleUtils.drawCircle;
 import static net.ddns.lagarderie.racingplugin.utils.ParticleUtils.spawnRedstoneParticle;
-import static net.ddns.lagarderie.racingplugin.utils.TrackGraph.getShortestDistance;
-import static net.ddns.lagarderie.racingplugin.utils.TrackUtils.getCheckpointLocation;
-import static net.ddns.lagarderie.racingplugin.utils.TrackUtils.isPlayerInCheckpoint;
+import static net.ddns.lagarderie.racingplugin.utils.TrackUtils.*;
 import static org.bukkit.Bukkit.getServer;
 
-public class Racing {
-    private static Racing instance = null;
-
-    private LinkedList<RacingPlayer> racingPlayers;
-    private Track track;
+public class RacingGame {
+    private static RacingGame instance = null;
+    private final HashSet<UUID> playersCheckpointVisibility;
+    private String trackId;
     private int speed;
     private int lapCount;
     private boolean running;
 
-    private Racing() {
-        this.racingPlayers = new LinkedList<>();
-        this.track = null;
+    private RacingGame() {
+        this.playersCheckpointVisibility = new HashSet<>();
+        this.trackId = null;
         this.speed = 100;
         this.lapCount = 3;
         this.running = false;
     }
 
-    public static Racing getInstance() {
+    public static RacingGame getInstance() {
         if (instance == null) {
-            instance = new Racing();
+            instance = new RacingGame();
         }
         return instance;
     }
 
+    public static void setInstance(RacingGame newInstance) {
+        instance = newInstance;
+    }
+
     public void start() throws RacingGameException {
-        if (track == null) {
+        if (trackId == null) {
             throw new RacingGameException("Aucune course n'a été choisie.");
         } else if (running) {
             throw new RacingGameException("Un jeu est déjà en cours.");
         }
 
-        this.running = true;
-        this.racingPlayers = new LinkedList<>();
+        Track track = getTrack(trackId);
 
-        World world = getServer().getWorld(track.getMapId());
+        this.running = true;
+        LinkedList<RacingPlayer> racingPlayers = new LinkedList<>();
+
+        World world = getServer().getWorld(track.getId());
 
         BukkitScheduler scheduler = Bukkit.getScheduler();
 
@@ -72,7 +72,7 @@ public class Racing {
             racingPlayers.add(new RacingPlayer(player.getUniqueId()));
         }
 
-        scheduler.runTaskTimer(getRacingPlugin(), counterTask -> {
+        scheduler.runTaskTimer(getPlugin(), counterTask -> {
             if (!running || timer[0] == 0) {
                 counterTask.cancel();
                 for (RacingPlayer racingPlayer : racingPlayers) {
@@ -84,7 +84,7 @@ public class Racing {
                         player.sendTitle(ChatColor.GREEN + "Go !" + ChatColor.RESET, "", 0, 20, 0);
                     }
                 }
-                run();
+                run(racingPlayers, track);
             } else {
                 Checkpoint firstCheckpoint;
 
@@ -115,8 +115,8 @@ public class Racing {
         }, 0L, 5L);
     }
 
-    public void run() {
-        World world = getServer().getWorld(track.getMapId());
+    public void run(LinkedList<RacingPlayer> racingPlayers, Track track) {
+        World world = getServer().getWorld(track.getId());
 
         BukkitScheduler scheduler = Bukkit.getScheduler();
 
@@ -131,13 +131,13 @@ public class Racing {
         float totalTrackLength = trackLength * (float) (lapCount);
 
 
-        scheduler.runTaskTimer(getRacingPlugin(), gameTask -> {
+        scheduler.runTaskTimer(getPlugin(), gameTask -> {
             if (!running || world == null) {
                 gameTask.cancel();
             } else {
-                int speedEffect = Math.min(speed / 10, 255);
+                int speedEffectAmplifier = Math.min(speed / 10, 255);
 
-                sortPlayers(trackLength, totalTrackLength);
+                sortPlayers(racingPlayers, track, trackLength, totalTrackLength);
 
                 for (int i = 0; i < racingPlayers.size(); i++) {
                     RacingPlayer racingPlayer = racingPlayers.get(i);
@@ -146,25 +146,25 @@ public class Racing {
                     if (player != null) {
                         Block block = world.getBlockAt(player.getLocation().subtract(new Vector(0, 1, 0)));
 
-                        switch (block.getType()) {
-                            case YELLOW_CONCRETE, YELLOW_TERRACOTTA -> {
-                                int boostedSpeedEffect = Math.min((speedEffect + 5), 255);
-                                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 10, boostedSpeedEffect, false));
+                        ArrayList<PowerBlock> powerBlocks = PowerBlocksManager.getInstance().getPowerBlocks();
+                        for (PowerBlock powerBlock : powerBlocks) {
+                            if (powerBlock.getBlockMaterial() == block.getType()) {
+                                PotionEffect pe = powerBlock.getEffect(speedEffectAmplifier);
+
+                                if (pe != null) {
+                                    player.addPotionEffect(pe);
+                                }
+
+                                break;
                             }
-                            case GREEN_CONCRETE ->
-                                    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 5, 5, false));
-                            case MAGENTA_CONCRETE ->
-                                    player.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 5, 15, false));
                         }
 
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1, speedEffect, false));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1, speedEffectAmplifier, false));
 
                         String playerTime = String.format(Locale.US, "%.2f", (counter[0] / 20f));
                         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
                                 getPlayerPosition(i) + " - " + racingPlayer.getDistance() + "m - Temps : " + playerTime + " s"
                         ));
-
-                        // validate checkpoints
 
                         Checkpoint validatedCheckpoint = track.getCheckpoint(racingPlayer.getCheckedCheckpoints());
 
@@ -172,8 +172,10 @@ public class Racing {
                             Checkpoint nextCheckpoint = track.getCheckpoint(childId);
 
                             if (nextCheckpoint != null) {
-                                spawnRedstoneParticle(player, nextCheckpoint.getPosition(), Color.YELLOW, 0.5f);
-                                drawCircle(player, nextCheckpoint.getPosition(), Color.TEAL, nextCheckpoint.getRadius());
+                                if (canPlayerSeeCheckpoints(player)) {
+                                    spawnRedstoneParticle(player, nextCheckpoint.getPosition(), Color.YELLOW, 0.5f);
+                                    drawCircle(player, nextCheckpoint.getPosition(), Color.TEAL, nextCheckpoint.getRadius());
+                                }
 
                                 if (isPlayerInCheckpoint(player, nextCheckpoint)) {
                                     if (childId == track.getDepartureCheckpoint()) {
@@ -188,9 +190,8 @@ public class Racing {
                                         }
                                     }
                                     racingPlayer.setCheckedCheckpoints(childId);
+                                    break;
                                 }
-
-                                break;
                             } else if (!isPlayerInCheckpoint(player, validatedCheckpoint)) {
                                 player.teleport(getCheckpointLocation(world, validatedCheckpoint));
                             }
@@ -201,12 +202,12 @@ public class Racing {
                 }
 
                 counter[0]++;
-                running = !havePlayersFinished();
+                running = !havePlayersFinished(racingPlayers);
             }
         }, 0L, 1L);
     }
 
-    private void sortPlayers(float trackLength, float totalTrackLength) {
+    private void sortPlayers(LinkedList<RacingPlayer> racingPlayers, Track track, float trackLength, float totalTrackLength) {
         Checkpoint arrival = track.getCheckpoint(track.getArrivalCheckpoint());
 
         for (RacingPlayer racingPlayer : racingPlayers) {
@@ -250,7 +251,7 @@ public class Racing {
         Collections.sort(racingPlayers);
     }
 
-    private boolean havePlayersFinished() {
+    private boolean havePlayersFinished(LinkedList<RacingPlayer> racingPlayers) {
         for (RacingPlayer racingPlayer : racingPlayers) {
             if (racingPlayer.getCheckedLaps() < lapCount) {
                 return false;
@@ -281,12 +282,12 @@ public class Racing {
         running = false;
     }
 
-    public Track getTrack() {
-        return track;
+    public String getTrackId() {
+        return trackId;
     }
 
-    public void setTrack(Track track) {
-        this.track = track;
+    public void setTrack(String trackId) {
+        this.trackId = trackId;
     }
 
     public int getSpeed() {
@@ -307,5 +308,17 @@ public class Racing {
 
     public boolean isRunning() {
         return running;
+    }
+
+    public boolean canPlayerSeeCheckpoints(Player player) {
+        return this.playersCheckpointVisibility.contains(player.getUniqueId());
+    }
+
+    public boolean enableCheckpointVisibility(Player player) {
+        return this.playersCheckpointVisibility.add(player.getUniqueId());
+    }
+
+    public boolean disableCheckpointVisibility(Player player) {
+        return this.playersCheckpointVisibility.remove(player.getUniqueId());
     }
 }

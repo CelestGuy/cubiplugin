@@ -10,17 +10,17 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static net.ddns.lagarderie.racingplugin.utils.TrackUtils.saveTrack;
+import static net.ddns.lagarderie.racingplugin.utils.RacingGameUtils.saveTrack;
 
 public class CommandTrackCreate implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
             Track track = new Track();
-            track.setMapId(player.getWorld().getName());
+            track.setId(player.getWorld().getName());
             track.setName(player.getWorld().getName());
 
-            if (RacingPlugin.getRacingPlugin().getTracks().add(track)) {
+            if (RacingPlugin.getPlugin().getTracks().add(track)) {
                 player.sendMessage("La course a été créée");
             } else {
                 throw new RacingCommandException("Une erreur est survenue lors de la création de la course");

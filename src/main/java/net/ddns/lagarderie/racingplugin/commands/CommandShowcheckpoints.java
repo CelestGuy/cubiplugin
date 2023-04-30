@@ -1,8 +1,8 @@
 package net.ddns.lagarderie.racingplugin.commands;
 
+import net.ddns.lagarderie.racingplugin.game.RacingGame;
 import net.ddns.lagarderie.racingplugin.plugin.RacingCommandException;
 import net.ddns.lagarderie.racingplugin.plugin.SafeCommandExecutor;
-import net.ddns.lagarderie.racingplugin.tools.ShowCheckpoints;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -26,22 +26,20 @@ public class CommandShowcheckpoints extends SafeCommandExecutor {
     @Override
     public boolean executeSafeCommand(CommandSender commandSender, Command command, String s, String[] strings) throws RacingCommandException {
         if (commandSender instanceof Player player) {
-            ShowCheckpoints showCheckpoints = ShowCheckpoints.getPlayer(player.getUniqueId());
+            RacingGame racingGame = RacingGame.getInstance();
 
             if (strings.length == 1) {
                 switch (strings[0]) {
                     case "disable" -> {
-                        if (showCheckpoints.isEnabled()) {
+                        if (racingGame.disableCheckpointVisibility(player)) {
                             player.sendMessage(ChatColor.YELLOW + "Affichage des checkpoints désactivé !" + ChatColor.RESET);
-                            ShowCheckpoints.removePlayer(player.getUniqueId());
                         } else {
                             throw new RacingCommandException("Affichage des checkpoints déjà inactif !");
                         }
                     }
                     case "enable" -> {
-                        if (!showCheckpoints.isEnabled()) {
+                        if (racingGame.enableCheckpointVisibility(player)) {
                             player.sendMessage(ChatColor.GREEN + "Affichage des checkpoints activé !" + ChatColor.RESET);
-                            showCheckpoints.enable();
                         } else {
                             throw new RacingCommandException("Affichage des checkpoints déjà actif !");
                         }

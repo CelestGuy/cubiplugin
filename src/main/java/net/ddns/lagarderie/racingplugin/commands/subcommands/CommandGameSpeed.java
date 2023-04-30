@@ -1,7 +1,7 @@
 package net.ddns.lagarderie.racingplugin.commands.subcommands;
 
 import net.ddns.lagarderie.racingplugin.plugin.RacingCommandException;
-import net.ddns.lagarderie.racingplugin.game.Racing;
+import net.ddns.lagarderie.racingplugin.game.RacingGame;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -17,7 +17,7 @@ public class CommandGameSpeed implements TabExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
             if (strings.length == 0) {
-                int speed = Racing.getInstance().getSpeed();
+                int speed = RacingGame.getInstance().getSpeed();
                 String color = speedColor.get(availableSpeeds.indexOf(String.valueOf(speed)));
 
                 player.sendMessage("La vitesse actuelle de la course est " + color + speed + "§r !");
@@ -26,7 +26,7 @@ public class CommandGameSpeed implements TabExecutor {
                 String arg = strings[0];
                 if (availableSpeeds.contains(arg)) {
                     int speed = Integer.parseInt(arg);
-                    Racing game = Racing.getInstance();
+                    RacingGame game = RacingGame.getInstance();
 
                     if (game.isRunning()) {
                         throw new RacingCommandException("Impossible de modifier les paramètres du jeu.");

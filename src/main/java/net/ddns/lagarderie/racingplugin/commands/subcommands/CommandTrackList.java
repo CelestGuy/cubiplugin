@@ -12,7 +12,7 @@ public class CommandTrackList implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         commandSender.sendMessage("Liste des courses disponibles");
-        for (Track track : RacingPlugin.getRacingPlugin().getTracks()) {
+        for (Track track : RacingPlugin.getPlugin().getTracks()) {
             commandSender.sendMessage("   - " + track.getName());
         }
 

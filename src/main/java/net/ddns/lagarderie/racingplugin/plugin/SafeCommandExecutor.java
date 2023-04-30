@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,16 +28,18 @@ public abstract class SafeCommandExecutor implements TabExecutor {
     public boolean handleCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Map<String, TabExecutor> subcommands = getSubcommands();
 
-        if (strings.length >= 1) {
-            String arg = strings[0];
+        if (subcommands != null) {
+            if (strings.length >= 1) {
+                String arg = strings[0];
 
-            String[] args = new String[strings.length - 1];
-            System.arraycopy(strings, 1, args, 0, strings.length - 1);
+                String[] args = new String[strings.length - 1];
+                System.arraycopy(strings, 1, args, 0, strings.length - 1);
 
-            if (subcommands.containsKey(arg)) {
-                return subcommands.get(strings[0]).onCommand(commandSender, command, s, args);
-            } else {
-                throw new RacingCommandException("Cet argument n'existe pas !");
+                if (subcommands.containsKey(arg)) {
+                    return subcommands.get(strings[0]).onCommand(commandSender, command, s, args);
+                } else {
+                    throw new RacingCommandException("Cet argument n'existe pas !");
+                }
             }
         }
 
@@ -47,7 +50,16 @@ public abstract class SafeCommandExecutor implements TabExecutor {
         Map<String, TabExecutor> subcommands = getSubcommands();
 
         if (strings.length == 1) {
-            return subcommands.keySet().stream().toList();
+            ArrayList<String> args = new ArrayList<>();
+            String arg = strings[0];
+
+            for (String key : subcommands.keySet()) {
+                if (key.contains(arg)) {
+                    args.add(key);
+                }
+            }
+
+            return args;
         } else if (strings.length > 1) {
             String arg = strings[0];
 

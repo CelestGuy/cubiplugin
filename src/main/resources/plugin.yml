@@ -21,11 +21,9 @@ commands:
     permission: op
     permission-message: Vous n'avez pas les permissions d'exécuter cette commande
     description: Gestion d'une course
-  autoplace:
-    permission: op
-    permission-message: Vous n'avez pas les permissions d'exécuter cette commande
-    description: Placement automatique des checkpoints
   showcheckpoints:
+    description: Affichage des checkpoints durant la course
+  powerblock:
     permission: op
     permission-message: Vous n'avez pas les permissions d'exécuter cette commande
-    description: Affichage des checkpoints
+    description: Gestion des blocs spéciaux

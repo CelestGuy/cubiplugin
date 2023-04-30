@@ -20,8 +20,8 @@ public class CommandTrack extends SafeCommandExecutor {
     public boolean executeSafeCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (strings.length == 0) {
             if (commandSender instanceof Player player) {
-                for (Track track : RacingPlugin.getRacingPlugin().getTracks()) {
-                    if (track.getMapId().equals(player.getWorld().getName())) {
+                for (Track track : RacingPlugin.getPlugin().getTracks()) {
+                    if (track.getId().equals(player.getWorld().getName())) {
                         player.sendMessage("Course " + (track.getName()));
                         return true;
                     }
@@ -48,6 +48,7 @@ public class CommandTrack extends SafeCommandExecutor {
         subcommands.put("remove", new CommandTrackRemove());
         subcommands.put("departure", new CommandTrackDeparture());
         subcommands.put("arrival", new CommandTrackArrival());
+        subcommands.put("name", new CommandTrackName());
 
         return subcommands;
     }

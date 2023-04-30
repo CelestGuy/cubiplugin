@@ -10,17 +10,16 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static net.ddns.lagarderie.racingplugin.utils.TrackUtils.saveTrack;
+import static net.ddns.lagarderie.racingplugin.utils.RacingGameUtils.saveTrack;
 
 public class CommandTrackRemove implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player player) {
-            for (Track track : RacingPlugin.getRacingPlugin().getTracks()) {
-                if (track.getMapId().equals(player.getWorld().getName())) {
-                    if (RacingPlugin.getRacingPlugin().getTracks().remove(track)) {
+            for (Track track : RacingPlugin.getPlugin().getTracks()) {
+                if (track.getId().equals(player.getWorld().getName())) {
+                    if (RacingPlugin.getPlugin().getTracks().remove(track)) {
                         player.sendMessage("La course a été supprimée");
-
                         saveTrack(track);
                         return true;
                     } else {

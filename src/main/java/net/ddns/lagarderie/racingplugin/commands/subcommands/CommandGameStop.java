@@ -1,7 +1,7 @@
 package net.ddns.lagarderie.racingplugin.commands.subcommands;
 
 import net.ddns.lagarderie.racingplugin.plugin.RacingCommandException;
-import net.ddns.lagarderie.racingplugin.game.Racing;
+import net.ddns.lagarderie.racingplugin.game.RacingGame;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,7 +13,7 @@ public class CommandGameStop implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         try {
-            Racing game = Racing.getInstance();
+            RacingGame game = RacingGame.getInstance();
 
             if (!game.isRunning()) {
                 throw new RacingCommandException("Aucun jeu n'est en cours.");

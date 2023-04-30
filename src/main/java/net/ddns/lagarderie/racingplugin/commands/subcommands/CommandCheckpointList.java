@@ -18,8 +18,8 @@ public class CommandCheckpointList implements TabExecutor {
         if (commandSender instanceof Player player) {
             String worldName = player.getWorld().getName();
 
-            for (Track track : RacingPlugin.getRacingPlugin().getTracks()) {
-                if (track.getMapId().equals(worldName)) {
+            for (Track track : RacingPlugin.getPlugin().getTracks()) {
+                if (track.getId().equals(worldName)) {
                     List<Checkpoint> checkpoints = track.getCheckpoints();
                     int checkpointsCount = checkpoints.size();
 

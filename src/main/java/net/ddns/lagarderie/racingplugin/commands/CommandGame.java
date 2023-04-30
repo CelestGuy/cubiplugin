@@ -2,7 +2,7 @@ package net.ddns.lagarderie.racingplugin.commands;
 
 import net.ddns.lagarderie.racingplugin.plugin.SafeCommandExecutor;
 import net.ddns.lagarderie.racingplugin.commands.subcommands.*;
-import net.ddns.lagarderie.racingplugin.game.Racing;
+import net.ddns.lagarderie.racingplugin.game.RacingGame;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -20,16 +20,16 @@ public class CommandGame extends SafeCommandExecutor {
             if (commandSender instanceof Player player) {
                 StringBuilder sb = new StringBuilder();
 
-                Racing game = Racing.getInstance();
+                RacingGame game = RacingGame.getInstance();
 
                 sb.append("Paramètres du jeu: ")
                         .append("\n   - Course : ");
-                if (game.getTrack() == null) {
+                if (game.getTrackId() == null) {
                     sb.append(ChatColor.RED);
                     sb.append("Non choisie");
                     sb.append(ChatColor.RESET);
                 } else {
-                    sb.append(game.getTrack().getName());
+                    sb.append(game.getTrackId());
                 }
 
                 sb.append("\n   - Vitesse : ").append(game.getSpeed()).append(" cc");
