@@ -53,6 +53,7 @@ public class CommandCheckpoint extends SafeCommandExecutor {
         subcommands.put("add", new CommandCheckpointAdd());
         subcommands.put("list", new CommandCheckpointList());
         subcommands.put("radius", new CommandCheckpointRadius());
+        subcommands.put("angle", new CommandCheckpointAngle());
         subcommands.put("remove", new CommandCheckpointRemove());
         subcommands.put("tp", new CommandCheckpointTeleport());
 

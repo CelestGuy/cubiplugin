@@ -17,8 +17,7 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 import static net.ddns.lagarderie.racingplugin.RacingPlugin.getPlugin;
-import static net.ddns.lagarderie.racingplugin.utils.ParticleUtils.drawCircle;
-import static net.ddns.lagarderie.racingplugin.utils.ParticleUtils.spawnRedstoneParticle;
+import static net.ddns.lagarderie.racingplugin.utils.ParticleUtils.*;
 import static net.ddns.lagarderie.racingplugin.utils.TrackUtils.*;
 import static org.bukkit.Bukkit.getServer;
 
@@ -57,6 +56,10 @@ public class RacingGame {
         }
 
         Track track = getTrack(trackId);
+
+        if (track.getCheckpoints().size() == 0) {
+            throw new RacingGameException("La course ne contient aucun checkpoints");
+        }
 
         this.running = true;
         LinkedList<RacingPlayer> racingPlayers = new LinkedList<>();
@@ -132,7 +135,7 @@ public class RacingGame {
 
 
         scheduler.runTaskTimer(getPlugin(), gameTask -> {
-            if (!running || world == null) {
+            if (!running || world == null || track.getCheckpoints().size() == 0) {
                 gameTask.cancel();
             } else {
                 int speedEffectAmplifier = Math.min(speed / 10, 255);
@@ -173,8 +176,7 @@ public class RacingGame {
 
                             if (nextCheckpoint != null) {
                                 if (canPlayerSeeCheckpoints(player)) {
-                                    spawnRedstoneParticle(player, nextCheckpoint.getPosition(), Color.YELLOW, 0.5f);
-                                    drawCircle(player, nextCheckpoint.getPosition(), Color.TEAL, nextCheckpoint.getRadius());
+                                    drawCheckpoint(player, nextCheckpoint);
                                 }
 
                                 if (isPlayerInCheckpoint(player, nextCheckpoint)) {

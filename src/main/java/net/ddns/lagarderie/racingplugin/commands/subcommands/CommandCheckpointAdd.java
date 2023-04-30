@@ -21,12 +21,15 @@ import static net.ddns.lagarderie.racingplugin.utils.TrackUtils.*;
 public class CommandCheckpointAdd implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+        if (strings.length < 3) {
+            throw new RacingCommandException("Il n'y a pas assez d'arguments.");
+        } else if (strings.length > 4) {
+            throw new RacingCommandException("Il y a trop d'arguments.");
+        }
+
         if (commandSender instanceof Player player) {
             String worldName = player.getWorld().getName();
             Track track;
-
-            float radius = 1f;
-            int parentCheckpointId = -1;
 
             try {
                 track = getTrack(worldName);
@@ -36,23 +39,24 @@ public class CommandCheckpointAdd implements TabExecutor {
 
             int maxId = getMaxCheckpointId(track);
 
-            if (strings.length >= 1) {
-                radius = Float.parseFloat(strings[0]);
-            }
-            if (strings.length == 2) {
-                parentCheckpointId = Integer.parseInt(strings[1]);
-            } else {
-                parentCheckpointId = maxId;
-            }
+            CheckpointType type = CheckpointType.parseType(strings[0]);
+            float radius = Float.parseFloat(strings[1]);
+            float angle = Float.parseFloat(strings[2]);
+            int parentCheckpointId = maxId;
 
+            if (strings.length == 4) {
+                parentCheckpointId = Integer.parseInt(strings[1]);
+            }
 
             Location playerLocation = player.getLocation();
             Checkpoint checkpoint = new Checkpoint(
                     maxId + 1,
+                    type,
                     playerLocation.toVector(),
-                    playerLocation.getPitch(),
                     playerLocation.getYaw(),
-                    radius
+                    playerLocation.getPitch(),
+                    radius,
+                    angle
             );
 
             track.getCheckpoints().add(checkpoint);
@@ -77,20 +81,30 @@ public class CommandCheckpointAdd implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (strings.length == 2 && commandSender instanceof Player player) {
-            ArrayList<String> checkpointIds = new ArrayList<>();
-            String arg = strings[0];
+        if (commandSender instanceof Player player) {
+            if (strings.length == 1) {
+                ArrayList<String> types = new ArrayList<>();
 
-            try {
-                for (Checkpoint checkpoint : getTrack(player.getWorld().getName()).getCheckpoints()) {
-                    String id = String.valueOf(checkpoint.getId());
-                    if (id.contains(arg)) {
-                        checkpointIds.add(arg);
-                    }
+                for (CheckpointType type : CheckpointType.values()) {
+                    types.add(type.toString());
                 }
-            } catch (RacingGameException ignored) {}
 
-            return checkpointIds;
+                return types;
+            } else if (strings.length == 3) {
+                ArrayList<String> checkpointIds = new ArrayList<>();
+                String arg = strings[0];
+
+                try {
+                    for (Checkpoint checkpoint : getTrack(player.getWorld().getName()).getCheckpoints()) {
+                        String id = String.valueOf(checkpoint.getId());
+                        if (id.contains(arg)) {
+                            checkpointIds.add(id);
+                        }
+                    }
+                } catch (RacingGameException ignored) {}
+
+                return checkpointIds;
+            }
         }
 
         return List.of();

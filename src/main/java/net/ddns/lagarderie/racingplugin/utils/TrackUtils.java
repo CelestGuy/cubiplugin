@@ -2,6 +2,7 @@ package net.ddns.lagarderie.racingplugin.utils;
 
 import com.google.gson.Gson;
 import net.ddns.lagarderie.racingplugin.RacingPlugin;
+import net.ddns.lagarderie.racingplugin.game.CheckpointType;
 import net.ddns.lagarderie.racingplugin.game.PowerBlock;
 import net.ddns.lagarderie.racingplugin.plugin.RacingGameException;
 import net.ddns.lagarderie.racingplugin.game.Checkpoint;
@@ -11,8 +12,12 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 public class TrackUtils {
     public static Track getTrack(String trackId) throws RacingGameException {
@@ -84,8 +89,33 @@ public class TrackUtils {
             Vector playerLocation = player.getLocation().toVector();
             Vector checkpointLocation = checkpoint.getPosition();
 
-            return playerLocation.subtract(checkpointLocation).lengthSquared() <=
-                    (checkpoint.getRadius() * checkpoint.getRadius());
+            switch (checkpoint.getType()) {
+                case CIRCLE -> {
+                    return playerLocation.subtract(checkpointLocation).lengthSquared() <=
+                            (checkpoint.getRadius() * checkpoint.getRadius());
+                }
+                case RECTANGLE -> {
+                    double width = checkpoint.getRadius();
+                    double height = 1D;
+                    double x = checkpoint.getPosition().getX();
+                    double z = checkpoint.getPosition().getZ();
+
+                    Vector rotationAxis = new Vector(x, playerLocation.getY(), z);
+
+                    Rectangle2D rect = new Rectangle2D.Double(
+                            x - width / 2D,
+                            z - height / 2D,
+                            width,
+                            height
+                    );
+
+                    playerLocation.rotateAroundAxis(rotationAxis, checkpoint.getAngle());
+
+                    Point2D p = new Point2D.Double(playerLocation.getX(), playerLocation.getZ());
+
+                    return rect.contains(p);
+                }
+            }
         }
 
         return false;
@@ -122,7 +152,7 @@ public class TrackUtils {
     public static Location getCheckpointLocation(World world, Checkpoint checkpoint) {
         Vector position = checkpoint.getPosition();
 
-        return new Location(world, position.getX(), position.getY(), position.getZ(), checkpoint.getYaw(), checkpoint.getPitch());
+        return new Location(world, position.getX(), position.getY(), position.getZ(), (float) checkpoint.getYaw(), (float) checkpoint.getPitch());
     }
 
     public static float getShortestDistance(Track track, Checkpoint a, Checkpoint b) {

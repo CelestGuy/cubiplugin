@@ -8,53 +8,40 @@ import java.util.ArrayList;
 import static net.ddns.lagarderie.racingplugin.utils.TrackUtils.getCenteredPosition;
 
 public class Checkpoint {
-    private int id;
-    private ArrayList<Integer> children;
-    private float radius;
+    private final int id;
+    private final ArrayList<Integer> children;
+    private CheckpointType type;
+    private double angle;
+    private double radius;
     private Vector position;
-    private float yaw;
-    private float pitch;
+    private double yaw;
+    private double pitch;
 
-    public Checkpoint() {
-        this.id = 0;
-        this.position = new Vector();
-        this.children = new ArrayList<>();
-        this.radius = 1f;
-        this.yaw = 0f;
-        this.pitch = 0f;
-    }
-
-    public Checkpoint(int id, Vector position, float yaw, float pitch, float radius) {
+    public Checkpoint(int id, CheckpointType type, Vector position, double yaw, double pitch, double radius, double angle) {
         this.id = id;
+        this.type = type;
         this.position = getCenteredPosition(position);
         this.children = new ArrayList<>();
         this.yaw = yaw;
         this.pitch = pitch;
         this.radius = radius;
+        this.angle = angle;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public ArrayList<Integer> getChildren() {
         return children;
     }
 
-    public void setChildren(ArrayList<Integer> children) {
-        this.children = children;
+    public CheckpointType getType() {
+        return type;
     }
 
-    public float getRadius() {
-        return radius;
-    }
-
-    public void setRadius(float radius) {
-        this.radius = radius;
+    public void setType(CheckpointType type) {
+        this.type = type;
     }
 
     public Vector getPosition() {
@@ -65,7 +52,7 @@ public class Checkpoint {
         this.position = getCenteredPosition(position);
     }
 
-    public float getYaw() {
+    public double getYaw() {
         return yaw;
     }
 
@@ -73,12 +60,28 @@ public class Checkpoint {
         this.yaw = yaw;
     }
 
-    public float getPitch() {
+    public double getPitch() {
         return pitch;
     }
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(float radius) {
+        this.radius = radius;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = Math.toRadians(angle);
     }
 
     public void addChildCheckpoint(int childId) throws RacingGameException {

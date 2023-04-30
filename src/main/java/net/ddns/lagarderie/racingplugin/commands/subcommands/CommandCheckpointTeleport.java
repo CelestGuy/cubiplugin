@@ -51,7 +51,7 @@ public class CommandCheckpointTeleport implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
-        if (strings.length == 1 && commandSender instanceof Player player) {
+        if (commandSender instanceof Player player && strings.length == 1 ) {
             ArrayList<String> checkpointIds = new ArrayList<>();
             String arg = strings[0];
 
@@ -59,7 +59,7 @@ public class CommandCheckpointTeleport implements TabExecutor {
                 for (Checkpoint checkpoint : getTrack(player.getWorld().getName()).getCheckpoints()) {
                     String id = String.valueOf(checkpoint.getId());
                     if (id.contains(arg)) {
-                        checkpointIds.add(arg);
+                        checkpointIds.add(id);
                     }
                 }
             } catch (RacingGameException ignored) {}
